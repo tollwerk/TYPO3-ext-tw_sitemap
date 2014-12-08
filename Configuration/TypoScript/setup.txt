@@ -1,0 +1,112 @@
+plugin.tx_twsitemap {
+	view {
+		templateRootPath			= {$plugin.tx_twsitemap.view.templateRootPath}
+		partialRootPath				= {$plugin.tx_twsitemap.view.partialRootPath}
+		layoutRootPath				= {$plugin.tx_twsitemap.view.layoutRootPath}
+	}
+	persistence {
+		storagePid					= {$plugin.tx_twsitemap.persistence.storagePid}
+	}
+	settings {
+		domain						= {$plugin.tx_twsitemap.settings.domain}
+		baseUrl						= {$plugin.tx_twsitemap.settings.baseUrl}
+		lang						= {$plugin.tx_twsitemap.settings.lang}
+		entries {
+		
+		}
+	}
+}
+
+# XML-Sitemap
+xmlSitemap							= PAGE
+xmlSitemap {
+	typeNum							= 1210
+	config {
+		no_cache					= 1
+		disableAllHeaderCode		= 1
+		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		tx_cooluri_enable			= 1
+	}
+	10								= USER
+	10 {
+		userFunc					= tx_extbase_core_bootstrap->run
+		settings					< plugin.tx_twsitemap.settings
+		persistence					< plugin.tx_twsitemap.persistence
+		view						< plugin.tx_twsitemap.view
+		vendorName					= Tollwerk
+		pluginName					= Sitemap
+		extensionName				= TwSitemap
+		controller					= Sitemap
+		action						= index
+		switchableControllerActions {
+			Sitemap {
+				1					= index
+			}
+		}    
+	}
+}
+
+# XML-Sitemap (komprimiert)
+xmlSitemapGz						= PAGE
+xmlSitemapGz						< xmlSitemap
+xmlSitemapGz.typeNum				= 1211
+
+# TypoScript-Einträge
+xmlSitemapTyposcript				= PAGE
+xmlSitemapTyposcript {
+	typeNum							= 1212
+	config {
+		no_cache					= 1
+		disableAllHeaderCode		= 1
+		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		simulateStaticDocuments		= 0
+		tx_cooluri_enable			= 1
+	}
+	10								= USER
+	10 {
+		userFunc					= tx_extbase_core_bootstrap->run
+		settings					< plugin.tx_twsitemap.settings
+		persistence					< plugin.tx_twsitemap.persistence
+		view						< plugin.tx_twsitemap.view
+		vendorName					= Tollwerk
+		pluginName					= Sitemap
+		extensionName				= TwSitemap
+		controller					= Sitemap
+		action						= typoscript
+		switchableControllerActions {
+			Sitemap {
+				1					= typoscript
+			}
+		}    
+	}
+}
+
+# Plugin-Einträge
+xmlSitemapPlugin					= PAGE
+xmlSitemapPlugin {
+	typeNum							= 1213
+	config {
+		no_cache					= 1
+		disableAllHeaderCode		= 1
+		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		simulateStaticDocuments		= 0
+		tx_cooluri_enable			= 1
+	}
+	10								= USER
+	10 {
+		userFunc					= tx_extbase_core_bootstrap->run
+		settings					< plugin.tx_twsitemap.settings
+		persistence					< plugin.tx_twsitemap.persistence
+		view						< plugin.tx_twsitemap.view
+		vendorName					= Tollwerk
+		pluginName					= Sitemap
+		extensionName				= TwSitemap
+		controller					= Sitemap
+		action						= plugin
+		switchableControllerActions {
+			Sitemap {
+				1					= plugin
+			}
+		}    
+	}
+}

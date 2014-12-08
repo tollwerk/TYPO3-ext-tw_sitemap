@@ -1,0 +1,22 @@
+plugin.tx_twsitemap {
+	view {
+		# cat=plugin.tx_twsitemap/file; type=string; label=Path to template root (FE)
+		templateRootPath = EXT:tw_sitemap/Resources/Private/Templates/
+		# cat=plugin.tx_twsitemap/file; type=string; label=Path to template partials (FE)
+		partialRootPath = EXT:tw_sitemap/Resources/Private/Partials/
+		# cat=plugin.tx_twsitemap/file; type=string; label=Path to template layouts (FE)
+		layoutRootPath = EXT:tw_sitemap/Resources/Private/Layouts/
+	}
+	persistence {
+		# cat=plugin.tx_twsitemap//a; type=int+; label=General storage PID: Page ID sitemap entries
+		storagePid = 0
+	}
+	settings {
+		# cat=plugin.tx_twsitemap/settings; type=string; label=Sitemap target domain
+		domain =
+		# cat=plugin.tx_twsitemap/settings; type=string; label=Base URL for sitemap entry requests
+		baseUrl =
+		# cat=plugin.tx_twsitemap/settings; type=string; label=Language parameter name
+		lang = L 
+	}
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+	<meta type="array">
+		<type>module</type>
+		<description>Language labels for the XML Sitemap extension in the FRONTEND</description>
+	</meta>
+	<data type="array">
+		<languageKey index="default" type="array">
+			<label index="tx_twsitemap_domain_model_entry">XML sitemap entry</label>
+			<label index="tx_twsitemap_domain_model_entry.origin">Origin</label>
+			<label index="tx_twsitemap_domain_model_entry.loc">URL</label>
+			<label index="tx_twsitemap_domain_model_entry.lastmod">Last modified</label>
+			<label index="tx_twsitemap_domain_model_entry.changefreq">Change frequency</label>
+			<label index="tx_twsitemap_domain_model_entry.priority">Priority</label>
+			<label index="scheduler.sitemap">XML sitemap generation</label>
+			<label index="scheduler.sitemap.description">Scheduler task for the generation / update of registered XML sitemaps</label>
+			<label index="scheduler.entries">XML sitemap entry generation</label>
+			<label index="scheduler.entries.description">Scheduler task for the generation / update of XML sitemap entries according to the TypoScript entries configuration</label>
+		</languageKey>
+		<languageKey index="de" type="array">
+			<label index="tx_twsitemap_domain_model_entry">XML-Sitemapeintrag</label>
+			<label index="tx_twsitemap_domain_model_entry.origin">Ursprung</label>
+			<label index="tx_twsitemap_domain_model_entry.loc">URL</label>
+			<label index="tx_twsitemap_domain_model_entry.lastmod">Letzte Änderung</label>
+			<label index="tx_twsitemap_domain_model_entry.changefreq">Änderungsfrequenz</label>
+			<label index="tx_twsitemap_domain_model_entry.priority">Priorität</label>
+			<label index="scheduler.sitemap">XML-Sitemap-Erzeugung</label>
+			<label index="scheduler.sitemap.description">Planer-Aufgabe zur Erzeugung / Aktualisierung von registrierten XML-Sitemaps</label>
+			<label index="scheduler.entries">XML-Sitemap-Eintragserzeugung</label>
+			<label index="scheduler.entries.description">Planer-Aufgabe zur Erzeugung / Aktualisierung von XML-Sitemap-Einträgen anhand der hinterlegten TypoScript-Eintragskonfiguration</label>
+		</languageKey>
+	</data>
+</T3locallang>
