@@ -84,6 +84,9 @@
 			<trans-unit id="feplugin" xml:space="preserve">
 				<source>XML Sitemap</source>
 			</trans-unit>
+			<trans-unit id="scheduler.entries.root" xml:space="preserve">
+				<source>Root page ID</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

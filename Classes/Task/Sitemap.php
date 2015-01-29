@@ -307,4 +307,53 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		
 		return true;
 	}
+	
+	public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject) {
+		$additionalFields				= array();
+	
+		// Language parameter
+		$fieldName						= 'tx_scheduler[tw_sitemap_lang]';
+		$fieldId						= 'task_sitemap_lang';
+		$fieldHTML						= '<input type="text" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->lang) ? 'L' : $task->lang).'"/>';
+		$additionalFields[$fieldId]		= array(
+			'code'						=> $fieldHTML,
+			'label'						=> 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.lang',
+			'cshKey'					=> '_MOD_system_txschedulerM1',
+			'cshLabel'					=> $fieldId
+		);
+	
+		$fieldName						= 'tx_scheduler[tw_sitemap_baseurl]';
+		$fieldId						= 'task_sitemap_baseurl';
+		$fieldOptions					= $this->_getSitemapOptions($taskInfo['scheduler_cachingFrameworkGarbageCollection_selectedBackends']);
+		$fieldHtml = '<select name="' . $fieldName . '" id="' . $fieldId . '" class="wide" size="10" multiple="multiple">' . $fieldOptions . '</select>';
+		$additionalFields[$fieldId] = array(
+			'code' => $fieldHtml,
+			'label' => 'LLL:EXT:scheduler/Resources/Private/Language/locallang.xlf:label.cachingFrameworkGarbageCollection.selectBackends',
+			'cshKey' => '_MOD_system_txschedulerM1',
+			'cshLabel' => $fieldId
+		);
+	
+		return $additionalFields;
+	}
+	public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject) {
+		return true;
+	}
+	
+	public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task) {
+		$task->lang						= $submittedData['tw_sitemap_lang'];
+		// 		$task->lang						= $submittedData['tw_sitemap_lang'];
+	}
+	
+
+	/**
+	 * Return all available sitemaps as options
+	 *
+	 * @param \int $selectedSitemap		Selected sitemap
+	 * @return \string					Sitemap options
+	 */
+	protected function _getSitemapOptions($selectedSitemap = 0) {
+		$options						= array();
+	
+		return implode('', $options);
+	}
 }

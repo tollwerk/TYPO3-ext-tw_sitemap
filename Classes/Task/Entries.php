@@ -35,7 +35,7 @@ namespace Tollwerk\TwSitemap\Task;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
+class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface {
 	/**
 	 * Basis-URL für Sitemap-Eintragsabfrage
 	 * 
@@ -87,19 +87,21 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 	 * @see tx_scheduler_Task::execute()
 	 */
 	public function execute() {
+		
 		// Ermitteln des TypoScript-Setups für Sitemap-Einträge
+		$_GET['id']						= intval($this->root);
 		$setup							= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager')->getTypoScriptSetup();
 		$settings						= $setup['plugin.']['tx_twsitemap.']['settings.'];
 		$entriesSetup					= $settings['entries.'];
 		// Prüfen, ob ein Sprachparameter gültig definiert ist
 		if (!array_key_exists('lang', $settings) || !strlen(trim($settings['lang']))) {
-			trigger_error('Invalid language parameter definition');
+			throw new \Exception('Invalid language parameter definition');
 			return false;
 		}
 		
 		// Prüfen, ob ein Basis-URL gültig definiert ist
 		if (!array_key_exists('baseUrl', $settings) || !strlen(trim($settings['baseUrl']))) {
-			trigger_error('Invalid base URL definition');
+			throw new \Exception('Invalid base URL definition');
 			return false;
 		}
 		
@@ -391,5 +393,65 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		curl_close($curl);
 	
 		return $data;
+	}
+	
+	/**
+	 * Return the additional fields
+	 * 
+	 * @param \array $taskInfo
+	 * @param unknown $task
+	 * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject
+	 * @return multitype:multitype:string
+	 */
+	public function getAdditionalFields(array &$taskInfo, $task, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject) {
+		$additionalFields				= array();
+		
+		// Root page
+		$fieldName						= 'tx_scheduler[tw_sitemap_root]';
+		$fieldId						= 'task_sitemap_root';
+		$fieldHTML						= '<input type="text" size="3" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->root) ? (($parentObject->CMD === 'add') ? 'L' : '') : $task->root).'"/>';
+		$additionalFields[$fieldId]		= array(
+			'code'						=> $fieldHTML,
+			'label'						=> 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.root',
+			'cshKey'					=> '_MOD_system_txschedulerM1',
+			'cshLabel'					=> $fieldId
+		);
+
+		return $additionalFields;
+	}
+	
+	/**
+	 * Validate the additional fields
+	 * 
+	 * @param \array $submittedData														Submitted data
+	 * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject	Parent controller object
+	 * @return \boolean																	Field validity
+	 */
+	public function validateAdditionalFields(array &$submittedData, \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject) {
+		$valid							= true;
+		
+		$submittedData['tw_sitemap_root']		= trim($submittedData['tw_sitemap_root']);
+		if (!intval($submittedData['tw_sitemap_root'])) {
+			$parentObject->addMessage('The root page ID must be a valid integer', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+			$valid						= false;
+		} else {
+			$rootPage					= $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('uid', 'pages', 'deleted=0 AND hidden=0 AND uid='.intval($submittedData['tw_sitemap_root']));
+			if (empty($rootPage)) {
+				$parentObject->addMessage('The root page ID must refer to a valid page', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+				$valid					= false;
+			}
+		}
+		
+		return $valid;
+	}
+	
+	/**
+	 * Save the additional field values
+	 * 
+	 * @param \array $submittedData														Submitted fields
+	 * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task								Task instance
+	 */
+	public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task) {
+		$task->root						= intval(trim($submittedData['tw_sitemap_root']));
 	}
 }
