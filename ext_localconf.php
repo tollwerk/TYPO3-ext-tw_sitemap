@@ -53,5 +53,5 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSit
 	'extension'			=> $_EXTKEY,
 	'title'				=> 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
 	'description'		=> 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
-	'additionalFields'	=> \Tollwerk\TwSitemap\Task\Entries::class
+	'additionalFields'	=> 'Tollwerk\\TwSitemap\\Task\\Entries',
 );

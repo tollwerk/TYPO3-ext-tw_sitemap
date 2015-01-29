@@ -43,6 +43,12 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	 */
 	protected $_baseUrl;
 	/**
+	 * TypoScript service
+	 * 
+	 * @var unknown
+	 */
+	protected $_typoscriptService = null;
+	/**
 	 * Konfigurationstypen
 	 * 
 	 * @var array
@@ -89,10 +95,10 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	public function execute() {
 		
 		// Ermitteln des TypoScript-Setups für Sitemap-Einträge
-		$_GET['id']						= intval($this->root);
-		$setup							= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager')->getTypoScriptSetup();
-		$settings						= $setup['plugin.']['tx_twsitemap.']['settings.'];
-		$entriesSetup					= $settings['entries.'];
+		$_GET['id']									= intval($this->root);
+		$setup										= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager')->getTypoScriptSetup();
+		$settings									= $setup['plugin.']['tx_twsitemap.']['settings.'];
+		$entriesSetup								= $settings['entries.'];
 		// Prüfen, ob ein Sprachparameter gültig definiert ist
 		if (!array_key_exists('lang', $settings) || !strlen(trim($settings['lang']))) {
 			throw new \Exception('Invalid language parameter definition');
@@ -106,10 +112,11 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		}
 		
 		if (count($entriesSetup)) {
-			$this->_cycle				= time();
+			$this->_typoscriptService				= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+			$this->_cycle							= time();
 			
 			// Bestimmen des Basis-URL
-			$this->_baseUrl				= (array)parse_url($settings['baseUrl']);
+			$this->_baseUrl							= (array)parse_url($settings['baseUrl']);
 			if (!array_key_exists('scheme', $this->_baseUrl)) {
 				$this->_baseUrl['scheme']			= 'http';
 			}
@@ -160,10 +167,10 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	protected function _generateEntries($key, array $config, array $settings) {
 
 		// Bestimmen der Rendering-Basisseite
-		$pid						= array_key_exists('pid', $config) ? intval($config['pid']) : 0;
+		$pid										= array_key_exists('pid', $config) ? intval($config['pid']) : 0;
 
 		// Bestimmen der Eintragsdomain
-		$domain						= array_key_exists('domain', $config) ? trim($config['domain']) : null;
+		$domain										= array_key_exists('domain', $config) ? trim($config['domain']) : null;
 
 		// Abbruch bei fehlenden Parametern
 		if (($pid <= 0) || !strlen($domain)) {
@@ -171,38 +178,44 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		}
 
 		// Bestimmen des Sprachparameters sowie der zu durchlaufenden Sprachen
-		$langParam					= trim($settings['lang']);
-		$languages					= (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['languages'])) : array(0);
-		$locales					= array_pad((array_key_exists('locales', $config) && strlen(trim($config['locales']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['locales'])) : array(), count($languages), '');
+		$langParam									= trim($settings['lang']);
+		$languages									= (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['languages'])) : array(0);
+		$locales									= array_pad((array_key_exists('locales', $config) && strlen(trim($config['locales']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['locales'])) : array(), count($languages), '');
 		
 		// Bestimmen der Eintragsherkunft
-		$origin						= array_key_exists('origin', $config) ? strval($config['origin']) : md5(serialize($config));
+		$origin										= array_key_exists('origin', $config) ? strval($config['origin']) : md5(serialize($config));
 
 		// Bestimmen der Änderungshäufigkeit
-		$changefreq					= array_key_exists('changefreq', $config) ? strtolower($config['changefreq']) : \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
+		$changefreq									= array_key_exists('changefreq', $config) ? strtolower($config['changefreq']) : \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
 		if (!in_array($changefreq, \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs)) {
-			$changefreq				= \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
+			$changefreq								= \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
 		}
 		
 		// Bestimmen der Priorität
-		$priority					= array_key_exists('priority', $config) ? floatval($config['priority']) : 0.5;
-		$priority					= max(0, min(1, $priority));
+		$priority									= array_key_exists('priority', $config) ? floatval($config['priority']) : 0.5;
+		$priority									= max(0, min(1, $priority));
 		
 		// Bestimmen der Eintragskonfiguration
-		$entryType					= array_key_exists('entries', $config) ? strtolower($config['entries']) : null;
+		$entryType									= array_key_exists('entries', $config) ? strtolower($config['entries']) : null;
 		if (strlen($entryType) && array_key_exists($entryType, self::$_configTypes) && array_key_exists('entries.', $config)) {
-			$this->_baseUrl['query']['id']					= $pid;
+			$baseUrl								= $this->_baseUrl;
+			
+			if (array_key_exists('baseUrl', $config)) {
+				if (is_string($config['baseUrl'])) {
+					$baseUrl						= \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($baseUrl, parse_url($config['baseUrl']));
+				}
+			} elseif (array_key_exists('baseUrl.', $config)) {
+				$baseUrl							= \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($baseUrl, $this->_typoscriptService->convertTypoScriptArrayToPlainArray($config['baseUrl.']));
+			}
+			
+			$baseUrl['query']['id']					= $pid;
 
 			// Durchlaufen aller Sprachen
 			foreach ($languages as $languageIndex => $language) {
-				$this->_baseUrl['query'][$langParam]		= $language;
-				
-				/*
-				$_GET[$langParam]	= $language;
-				*/
+				$baseUrl['query'][$langParam]		= $language;
 
 				// Delegation an die jeweilige Generierungsmethode
-				call_user_func(array($this, self::$_configTypes[$entryType]), $key, $config['entries.'], $domain, $origin, $changefreq, $priority, $locales[$languageIndex]);
+				call_user_func(array($this, self::$_configTypes[$entryType]), $key, $config['entries.'], $baseUrl, $domain, $origin, $changefreq, $priority, $locales[$languageIndex]);
 			}
 		}
 		
@@ -217,13 +230,14 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	 * @param string $key					Konfigurationsschlüssel
 	 * @param array $config					Typoscript-Konfiguration
 	 * @param string $domain				Sitemap-Domain
+	 * @param array $baseUrl				Anfrage-Basis-URL
 	 * @param string $defaultOrigin			Standard-Eintragsherkunft
 	 * @param string $defaultChangefreq		Standard-Änderungsfrequenz
 	 * @param floatval $defaultPriority		Standard-Priorität
 	 * @param string $defaultLocale			Standard-Locale
 	 * @return void
 	 */
-	protected function _generateFileEntries($key, array $config, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
+	protected function _generateFileEntries($key, array $config, array $baseUrl, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
 		if (array_key_exists('path', $config) && strlen(trim($config['path']))) {
 			$path				= PATH_site.trim($config['path']);
 			if (@is_file($path) && @is_readable($path)) {
@@ -238,14 +252,15 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	 * @param string $key					Konfigurationsschlüssel
 	 * @param array $config					Typoscript-Konfiguration
 	 * @param string $domain				Sitemap-Domain
+	 * @param array $baseUrl				Anfrage-Basis-URL
 	 * @param string $defaultOrigin			Standard-Eintragsherkunft
 	 * @param string $defaultChangefreq		Standard-Änderungsfrequenz
 	 * @param floatval $defaultPriority		Standard-Priorität
 	 * @param string $defaultLocale			Standard-Locale
 	 * @return void
 	 */
-	protected function _generatePluginEntries($key, array $config, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
-		$url									= $this->_baseUrl;
+	protected function _generatePluginEntries($key, array $config, array $baseUrl, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
+		$url									= $baseUrl;
 		$url['query']['type']					= 1213;
 		$url['query']['tx_twsitemap_sitemap']	= array('plugin' => $key);
 		$url									= $url['scheme'].'://'.$url['host'].(array_key_exists('port', $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
@@ -258,14 +273,15 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	 * @param string $key					Konfigurationsschlüssel
 	 * @param array $config					Typoscript-Konfiguration
 	 * @param string $domain				Sitemap-Domain
+	 * @param array $baseUrl				Anfrage-Basis-URL
 	 * @param string $defaultOrigin			Standard-Eintragsherkunft
 	 * @param string $defaultChangefreq		Standard-Änderungsfrequenz
 	 * @param floatval $defaultPriority		Standard-Priorität
 	 * @param string $defaultLocale			Standard-Locale
 	 * @return void
 	 */
-	protected function _generateTyposcriptEntries($key, array $config, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
-		$url									= $this->_baseUrl;
+	protected function _generateTyposcriptEntries($key, array $config, array $baseUrl, $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale) {
+		$url									= $baseUrl;
 		$url['query']['type']					= 1212;
 		$url['query']['tx_twsitemap_sitemap']	= array('typoscript' => $key);
 		$url									= $url['scheme'].'://'.$url['host'].(array_key_exists('port', $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);

@@ -78,9 +78,19 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 * @return string						XML-Sitemap
 	 */
 	public function indexAction() {
-		$domain								= $this->settings['domain'];
-		$sitemap							= strlen($domain) ? $this->sitemapRepository->findOneByTargetDomain($domain) : null;
-		$sitemap							= ($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap) ? $sitemap : (strlen($domain) ? $this->sitemapRepository->findOneByDomain($domain) : null);
+		$sitemap							= $this->sitemapRepository->findOneByTargetDomain($_SERVER['HTTP_HOST']);
+		if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
+			$sitemap						= $this->sitemapRepository->findOneByDomain($_SERVER['HTTP_HOST']);
+			if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
+				$domain						= $this->settings['domain'];
+				if (strlen($domain)) {
+					$sitemap				= $this->sitemapRepository->findOneByTargetDomain($domain);
+					if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
+						$sitemap			= $this->sitemapRepository->findOneByDomain($domain);
+					}
+				}
+			}
+		}
 		
 		// Wenn ein geeigneter Sitemap-Eintrag gefunden wurde ...
 		if ($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap) {
@@ -108,11 +118,11 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 */
 	public function typoscriptAction($typoscript = null) {
 		/*Tx_Extbase_Utility_TypoScript*/
-		$typoscriptService				= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
-		$this->_entriesConfiguration	= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-		$typoscript		= strval($typoscript);
-		$tsConfig		= (strlen($typoscript) && array_key_exists("$typoscript.", $this->_entriesConfiguration) && array_key_exists('entries.', $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
-		$tsResult		= is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->COBJ_ARRAY($tsConfig) : '';
+		$typoscriptService					= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+		$this->_entriesConfiguration		= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
+		$typoscript							= strval($typoscript);
+		$tsConfig							= (strlen($typoscript) && array_key_exists("$typoscript.", $this->_entriesConfiguration) && array_key_exists('entries.', $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
+		$tsResult							= is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->COBJ_ARRAY($tsConfig) : '';
 		die($tsResult);
 		exit;
 	}
@@ -126,17 +136,17 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	public function pluginAction($plugin = null) {
 		
 		/*Tx_Extbase_Utility_TypoScript*/
-		$typoscriptService				= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
-		$this->_entriesConfiguration	= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-		$plugin				= strval($plugin);
-		$pluginConfig		= (strlen($plugin) && array_key_exists("$plugin.", $this->_entriesConfiguration) && array_key_exists('entries.', $this->_entriesConfiguration["$plugin."])) ? $this->_entriesConfiguration["$plugin."]['entries.'] : null;
+		$typoscriptService					= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+		$this->_entriesConfiguration		= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
+		$plugin								= strval($plugin);
+		$pluginConfig						= (strlen($plugin) && array_key_exists("$plugin.", $this->_entriesConfiguration) && array_key_exists('entries.', $this->_entriesConfiguration["$plugin."])) ? $this->_entriesConfiguration["$plugin."]['entries.'] : null;
 		
 		// Ermitteln des Parameter-Basisnamens
-		$extensionName		= array_key_exists('extension', $pluginConfig) ? trim($pluginConfig['extension']) : null;
-		$pluginName			= array_key_exists('plugin', $pluginConfig) ? trim($pluginConfig['plugin']) : null;
-		$controller			= array_key_exists('controller', $pluginConfig) ? trim($pluginConfig['controller']) : null;
-		$action				= array_key_exists('action', $pluginConfig) ? trim($pluginConfig['action']) : null;
-		$parameter			= array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : array();
+		$extensionName						= array_key_exists('extension', $pluginConfig) ? trim($pluginConfig['extension']) : null;
+		$pluginName							= array_key_exists('plugin', $pluginConfig) ? trim($pluginConfig['plugin']) : null;
+		$controller							= array_key_exists('controller', $pluginConfig) ? trim($pluginConfig['controller']) : null;
+		$action								= array_key_exists('action', $pluginConfig) ? trim($pluginConfig['action']) : null;
+		$parameter							= array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : array();
 		
 		// Wenn der Parameterbasisname definiert werden kann und ein alternierender Parameter definiert ist
 		if (strlen($extensionName) && strlen($pluginName) && strlen($controller) && strlen($action) && count($parameter)) {
@@ -147,10 +157,10 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 			$this->view->assign('pageUid', $GLOBALS['TSFE']->id);
 				
 			// Definieren des Parameterbasisnamens, -namens und -typs
-			$parameters		= array();
-// 			$parameterBase	= strtolower('tx_'.strtr($pluginName, '_', '').'_'.strtr($controller, '_', ''));
-			$parameterName	= array_key_exists('name', $parameter) ? trim($parameter['name']) : null;
-			$parameterType	= array_key_exists('type', $parameter) ? trim($parameter['type']) : null;
+			$parameters						= array();
+// 			$parameterBase					= strtolower('tx_'.strtr($pluginName, '_', '').'_'.strtr($controller, '_', ''));
+			$parameterName					= array_key_exists('name', $parameter) ? trim($parameter['name']) : null;
+			$parameterType					= array_key_exists('type', $parameter) ? trim($parameter['type']) : null;
 			
 			// Wenn ein sinnvoller Parameter definiert ist ...
 			if (strlen($parameterName) && strlen($parameterType) && array_key_exists($parameterType, self::$_pluginParameterTypeCallbacks)) {
