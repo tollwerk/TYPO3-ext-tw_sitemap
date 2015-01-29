@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:32Z" product-name="tw_sitemap">
+		<header/>
+		<body>
+			<trans-unit id="pages.palette.searchengines" xml:space="preserve">
+				<source>Search engines</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_twsitemap_nofollow" xml:space="preserve">
+				<source>Follow links on this page</source>
+			</trans-unit>
+			<trans-unit id="pages.tx_twsitemap_noindex" xml:space="preserve">
+				<source>Index this page</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry" xml:space="preserve">
+				<source>XML Sitemap entry</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.domain" xml:space="preserve">
+				<source>Domain</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.origin" xml:space="preserve">
+				<source>Origin</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.source" xml:space="preserve">
+				<source>Source ID</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.loc" xml:space="preserve">
+				<source>URL</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.lastmod" xml:space="preserve">
+				<source>Last change</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq" xml:space="preserve">
+				<source>Change frequency</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.0" xml:space="preserve">
+				<source>Always</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.1" xml:space="preserve">
+				<source>Hourly</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.2" xml:space="preserve">
+				<source>Daily</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.3" xml:space="preserve">
+				<source>Weekly</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.4" xml:space="preserve">
+				<source>Monthly</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.5" xml:space="preserve">
+				<source>Yearly</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.6" xml:space="preserve">
+				<source>Never</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.priority" xml:space="preserve">
+				<source>Priority</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.language" xml:space="preserve">
+				<source>Language</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap" xml:space="preserve">
+				<source>XML Sitemap</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.domain" xml:space="preserve">
+				<source>Domain</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.target_domain" xml:space="preserve">
+				<source>Alternative target domain (optional)</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme" xml:space="preserve">
+				<source>URL scheme</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme.I.0" xml:space="preserve">
+				<source>HTTP</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme.I.1" xml:space="preserve">
+				<source>HTTPS</source>
+			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.gz" xml:space="preserve">
+				<source>Use GZIP compression</source>
+			</trans-unit>
+			<trans-unit id="feplugin" xml:space="preserve">
+				<source>XML Sitemap</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

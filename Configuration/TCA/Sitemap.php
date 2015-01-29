@@ -81,7 +81,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
 		),
 		'domain' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.domain',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.domain',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -90,7 +90,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
 		),
 		'target_domain' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.target_domain',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.target_domain',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -99,12 +99,12 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
 		),
 		'scheme' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.scheme',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme',
 			'config' => array(
 				'type' => 'select',
 				'items' => array(
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.scheme.I.0', 'http://'),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.scheme.I.1', 'https://'),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.0', 'http://'),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.1', 'https://'),
 				),
 				'size' => 1,
 				'maxitems' => 1,
@@ -113,7 +113,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
 		),
 		'gz' => array(
 			'exclude' => 1,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_sitemap.gz',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.gz',
 			'config' => array(
 				'type' => 'check',
 			),

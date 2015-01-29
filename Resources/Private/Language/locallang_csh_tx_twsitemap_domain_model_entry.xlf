@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:25Z" product-name="tw_sitemap">
+		<header/>
+		<body>
+			<trans-unit id="domain.description" xml:space="preserve">
+				<source>Domain</source>
+			</trans-unit>
+			<trans-unit id="origin.description" xml:space="preserve">
+				<source>Entry origin</source>
+			</trans-unit>
+			<trans-unit id="loc.description" xml:space="preserve">
+				<source>Entry URL</source>
+			</trans-unit>
+			<trans-unit id="lastmod.description" xml:space="preserve">
+				<source>Last modified</source>
+			</trans-unit>
+			<trans-unit id="changefreq.description" xml:space="preserve">
+				<source>Change frequency</source>
+			</trans-unit>
+			<trans-unit id="priority.description" xml:space="preserve">
+				<source>Priority</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

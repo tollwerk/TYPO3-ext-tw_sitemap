@@ -42,7 +42,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 	'columns' => array(
 		'domain' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.domain',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.domain',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -51,7 +51,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'origin' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.origin',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.origin',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -60,7 +60,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'loc' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.loc',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.loc',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -69,7 +69,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'lastmod' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.lastmod',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.lastmod',
 			'config' => array(
 				'type' => 'input',
 				'size' => 12,
@@ -81,17 +81,17 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'changefreq' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq',
 			'config' => array(
 				'type' => 'select',
 				'items' => array(
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.0', 0),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.1', 1),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.2', 2),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.3', 3),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.4', 4),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.5', 5),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.changefreq.I.6', 6),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.0', 0),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.1', 1),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.2', 2),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.3', 3),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.4', 4),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.5', 5),
+					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.6', 6),
 				),
 				'size' => 1,
 				'maxitems' => 1,
@@ -100,7 +100,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'priority' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.priority',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.priority',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,
@@ -113,7 +113,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'language' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.language',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.language',
 			'config' => array(
 				'type' => 'input',
 				'size' => 4,
@@ -124,7 +124,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		),
 		'source' => array(
 			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xml:tx_twsitemap_domain_model_entry.source',
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.source',
 			'config' => array(
 				'type' => 'input',
 				'size' => 30,

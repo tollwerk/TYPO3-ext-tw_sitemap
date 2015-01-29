@@ -3,18 +3,20 @@
 /***************************************************************
  *  Copyright notice
  *
- *  © 2012 Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>, tollwerk® GmbH
- *  
+ *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
  *  free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 3 of the License, or
+ *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
  *  The GNU General Public License can be found at
  *  http://www.gnu.org/copyleft/gpl.html.
+ *  A copy is found in the textfile GPL.txt and important notices to the license
+ *  from the author is found in LICENSE.txt distributed with these scripts.
+ *
  *
  *  This script is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,8 +30,8 @@ if (!defined ('TYPO3_MODE')) die('Access denied.');
 
 $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCONF);
 
-// Konfigurieren des Sitemap-Plugins
-Tx_Extbase_Utility_Extension::configurePlugin(
+// Configure the sitemap plugin
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
 	'Tollwerk.'.
 	$_EXTKEY,
 	'Sitemap',
@@ -41,14 +43,14 @@ Tx_Extbase_Utility_Extension::configurePlugin(
 	)
 );
 
-// Registrieren der Schedulder-Tasks
+// Register the scheduler tasks
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Sitemap'] = array(
     'extension'        => $_EXTKEY,
-    'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xml:scheduler.sitemap',
-    'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xml:scheduler.sitemap.description',
+    'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap',
+    'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap.description',
 );
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Entries'] = array(
 	'extension'        => $_EXTKEY,
-	'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xml:scheduler.entries',
-	'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xml:scheduler.entries.description',
+	'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
+	'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
 );

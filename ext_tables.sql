@@ -49,3 +49,11 @@ CREATE TABLE tx_twsitemap_domain_model_sitemap (
 	KEY parent (pid),
 	KEY domain (domain)
 );
+
+#
+# Table structure for table 'pages'
+#
+CREATE TABLE pages (
+    tx_twsitemap_nofollow tinyint(4) unsigned DEFAULT '0' NOT NULL,    
+    tx_twsitemap_noindex tinyint(4) unsigned DEFAULT '0' NOT NULL
+);
