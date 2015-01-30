@@ -83,7 +83,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 	 * @see tx_scheduler_Task::execute()
 	 */
 	public function execute() {
-		$objectManager			= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('\TYPO3\CMS\Extbase\Object\ObjectManager');
+		$objectManager			= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		
 		/* @var $sitemapModel \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository */
 		/* @var $sitemapEntryModel \Tollwerk\TwSitemap\Domain\Repository\EntryRepository */

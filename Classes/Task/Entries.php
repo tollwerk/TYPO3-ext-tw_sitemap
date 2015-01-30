@@ -35,7 +35,7 @@ namespace Tollwerk\TwSitemap\Task;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface {
+class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface {
 	/**
 	 * Basis-URL für Sitemap-Eintragsabfrage
 	 * 
@@ -99,6 +99,7 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		$setup										= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager')->getTypoScriptSetup();
 		$settings									= $setup['plugin.']['tx_twsitemap.']['settings.'];
 		$entriesSetup								= $settings['entries.'];
+		
 		// Prüfen, ob ein Sprachparameter gültig definiert ist
 		if (!array_key_exists('lang', $settings) || !strlen(trim($settings['lang']))) {
 			throw new \Exception('Invalid language parameter definition');
@@ -179,7 +180,7 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 
 		// Bestimmen des Sprachparameters sowie der zu durchlaufenden Sprachen
 		$langParam									= trim($settings['lang']);
-		$languages									= (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['languages'])) : array(0);
+		$languages									= (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['languages'])) : array('');
 		$locales									= array_pad((array_key_exists('locales', $config) && strlen(trim($config['locales']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['locales'])) : array(), count($languages), '');
 		
 		// Bestimmen der Eintragsherkunft
@@ -212,7 +213,9 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 
 			// Durchlaufen aller Sprachen
 			foreach ($languages as $languageIndex => $language) {
-				$baseUrl['query'][$langParam]		= $language;
+				if (strlen($language)) {
+					$baseUrl['query'][$langParam]	= $language;
+				}
 
 				// Delegation an die jeweilige Generierungsmethode
 				call_user_func(array($this, self::$_configTypes[$entryType]), $key, $config['entries.'], $baseUrl, $domain, $origin, $changefreq, $priority, $locales[$languageIndex]);
@@ -264,6 +267,11 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		$url['query']['type']					= 1213;
 		$url['query']['tx_twsitemap_sitemap']	= array('plugin' => $key);
 		$url									= $url['scheme'].'://'.$url['host'].(array_key_exists('port', $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
+		
+		if ($this->debug) {
+			$this->addMessage(sprintf('Fetching URL: <a href="%s" target="_blank">%s</a>', $url, $url), \TYPO3\CMS\Core\Messaging\FlashMessage::INFO);
+		}
+		
 		$this->_generateEntriesByXML(strval(@file_get_contents($url)), $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale);
 	}
 	
@@ -285,6 +293,11 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		$url['query']['type']					= 1212;
 		$url['query']['tx_twsitemap_sitemap']	= array('typoscript' => $key);
 		$url									= $url['scheme'].'://'.$url['host'].(array_key_exists('port', $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
+		
+		if ($this->debug) {
+			$this->addMessage(sprintf('Fetching URL: <a href="%s" target="_blank">%s</a>', $url, $url), \TYPO3\CMS\Core\Messaging\FlashMessage::INFO);
+		}
+		
 		$this->_generateEntriesByXML(strval(@file_get_contents($url)), $domain, $defaultOrigin, $defaultChangefreq, $defaultPriority, $defaultLocale);
 	}
 	
@@ -425,10 +438,21 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 		// Root page
 		$fieldName						= 'tx_scheduler[tw_sitemap_root]';
 		$fieldId						= 'task_sitemap_root';
-		$fieldHTML						= '<input type="text" size="3" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->root) ? (($parentObject->CMD === 'add') ? 'L' : '') : $task->root).'"/>';
+		$fieldHTML						= '<input type="text" size="3" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->root) ? 1 : $task->root).'"/>';
 		$additionalFields[$fieldId]		= array(
 			'code'						=> $fieldHTML,
 			'label'						=> 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.root',
+			'cshKey'					=> '_MOD_system_txschedulerM1',
+			'cshLabel'					=> $fieldId
+		);
+		
+		// Debug output
+		$fieldName						= 'tx_scheduler[tw_sitemap_debug]';
+		$fieldId						= 'task_sitemap_debug';
+		$fieldHTML						= '<input type="checkbox" value="1" name="'.$fieldName.'" id="'.$fieldId.'"'.((empty($task->debug) || !$task->debug) ? '' : ' checked="checked"').'"/>';
+		$additionalFields[$fieldId]		= array(
+			'code'						=> $fieldHTML,
+			'label'						=> 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.debug',
 			'cshKey'					=> '_MOD_system_txschedulerM1',
 			'cshLabel'					=> $fieldId
 		);
@@ -469,5 +493,17 @@ class Entries extends \TYPO3\CMS\Scheduler\Task\AbstractTask implements \TYPO3\C
 	 */
 	public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task) {
 		$task->root						= intval(trim($submittedData['tw_sitemap_root']));
+		$task->debug					= intval(trim($submittedData['tw_sitemap_debug']));
+	}
+	
+	/**
+	 * Get additional information about the task
+	 * 
+	 * @return string
+	 */
+	public function getAdditionalInformation() {
+		$root							= intval($this->root);
+		$root							= $root ? \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordRaw('pages', 'uid='.$root) : null;
+		return $root ? 'Root page: '.\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages', $root).' ('.$this->root.')' : '';
 	}
 }

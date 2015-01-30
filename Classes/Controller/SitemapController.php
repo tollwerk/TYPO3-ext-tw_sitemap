@@ -117,13 +117,15 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 * @return void
 	 */
 	public function typoscriptAction($typoscript = null) {
+		header('Content-Type: text/xml; charset=utf-8');
+		
 		/*Tx_Extbase_Utility_TypoScript*/
 		$typoscriptService					= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
 		$this->_entriesConfiguration		= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
 		$typoscript							= strval($typoscript);
 		$tsConfig							= (strlen($typoscript) && array_key_exists("$typoscript.", $this->_entriesConfiguration) && array_key_exists('entries.', $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
 		$tsResult							= is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->COBJ_ARRAY($tsConfig) : '';
-		die($tsResult);
+		die("<entries>$tsResult</entries>");
 		exit;
 	}
 	
@@ -134,6 +136,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 * @return void
 	 */
 	public function pluginAction($plugin = null) {
+		header('Content-Type: text/xml; charset=utf-8');
 		
 		/*Tx_Extbase_Utility_TypoScript*/
 		$typoscriptService					= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
@@ -166,6 +169,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 			if (strlen($parameterName) && strlen($parameterType) && array_key_exists($parameterType, self::$_pluginParameterTypeCallbacks)) {
 				$parameters[$parameterName]			= call_user_func(array($this, self::$_pluginParameterTypeCallbacks[$parameterType]), $parameter, $this->_entriesConfiguration["$plugin."]);
 				$this->view->assign('parameters', $parameters);
+				die($this->render());
 				
 			} else {
 				exit;

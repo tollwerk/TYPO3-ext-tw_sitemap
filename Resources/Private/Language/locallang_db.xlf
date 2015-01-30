@@ -87,6 +87,9 @@
 			<trans-unit id="scheduler.entries.root" xml:space="preserve">
 				<source>Root page ID</source>
 			</trans-unit>
+			<trans-unit id="scheduler.entries.debug" xml:space="preserve">
+				<source>Ouput debugging info</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>
