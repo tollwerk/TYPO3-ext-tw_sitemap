@@ -83,20 +83,22 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 	 * @see tx_scheduler_Task::execute()
 	 */
 	public function execute() {
-		$objectManager			= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$objectManager                = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		
 		/* @var $sitemapModel \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository */
 		/* @var $sitemapEntryModel \Tollwerk\TwSitemap\Domain\Repository\EntryRepository */
-		$sitemapModel			= $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
-		$sitemapEntryModel		= $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\EntryRepository');
+		$sitemapModel                 = $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
+		$sitemapEntryModel            = $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\EntryRepository');
+		
+		$success                      = true;
 
 		// Durchlaufen aller registrierten XML-Sitemaps
 		/* @var $sitemap \Tollwerk\TwSitemap\Domain\Model\Sitemap */
 		foreach ($sitemapModel->findAll() as $sitemap) {
-			$this->_generateSitemap($sitemap);			
+			$success                  = $success && $this->_generateSitemap($sitemap);			
 		}
 		
-		return true;
+		return $success;
 	}
 	
 	/************************************************************************************************
@@ -119,13 +121,15 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		// Ggf. Entfernen eines bereits vorhandenen Temporärverzeichnisses
 		if (@is_dir($sitemapTmpDirectory)) {
 			if (!$this->_deleteDirectory($sitemapTmpDirectory)) {
-				throw new Exception('Sitemap temporary directory could not be deleted');
+			    $this->addMessage('Sitemap temporary directory could not be deleted', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+			    return false;
 			}
 		}
 		
 		// Anlegen des Temporärverzeichnisses
 		if (!@mkdir($sitemapTmpDirectory, 0777, true) || !@chmod($sitemapTmpDirectory, 0777)) {
-			throw new Exception('Sitemap temporary directory could not be created');
+		    $this->addMessage('Sitemap temporary directory could not be created', \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+		    return false;
 		}
 		
 		// Abrufen und Durchlaufen aller Sitemap-Einträge
