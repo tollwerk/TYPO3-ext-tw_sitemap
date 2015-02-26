@@ -110,3 +110,28 @@ xmlSitemapPlugin {
 		}    
 	}
 }
+
+# ADD ROBOTS META ELEMENT
+[globalVar = LIT:1 = {$plugin.tx_twsitemap.settings.meta}]
+	page.meta.robots.cObject		= COA
+	page.meta.robots.cObject {
+		10							= CASE
+		10 {
+			key.field				= tx_twsitemap_nofollow
+			1						= TEXT
+			1.value					= nofollow
+			default					= TEXT
+			default.value			= follow
+			stdWrap.noTrimWrap		= ||, |
+		}
+		
+		20							= CASE
+		20 {
+			key.field				= tx_twsitemap_noindex
+			1						= TEXT
+			1.value					= noindex
+			default					= TEXT
+			default.value			= index
+		}
+	}
+[global]
