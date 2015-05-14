@@ -29,7 +29,7 @@ xmlSitemap {
 	}
 	10								= USER
 	10 {
-		userFunc					= tx_extbase_core_bootstrap->run
+		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
 		settings					< plugin.tx_twsitemap.settings
 		persistence					< plugin.tx_twsitemap.persistence
 		view						< plugin.tx_twsitemap.view
@@ -64,7 +64,7 @@ xmlSitemapTyposcript {
 	}
 	10								= USER
 	10 {
-		userFunc					= tx_extbase_core_bootstrap->run
+		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
 		settings					< plugin.tx_twsitemap.settings
 		persistence					< plugin.tx_twsitemap.persistence
 		view						< plugin.tx_twsitemap.view
@@ -94,7 +94,7 @@ xmlSitemapPlugin {
 	}
 	10								= USER
 	10 {
-		userFunc					= tx_extbase_core_bootstrap->run
+		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
 		settings					< plugin.tx_twsitemap.settings
 		persistence					< plugin.tx_twsitemap.persistence
 		view						< plugin.tx_twsitemap.view

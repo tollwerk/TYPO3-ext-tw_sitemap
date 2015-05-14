@@ -87,8 +87,8 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		
 		/* @var $sitemapModel \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository */
 		/* @var $sitemapEntryModel \Tollwerk\TwSitemap\Domain\Repository\EntryRepository */
-		$sitemapModel                 = $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
-		$sitemapEntryModel            = $objectManager->get('\Tollwerk\TwSitemap\Domain\Repository\EntryRepository');
+		$sitemapModel                 = $objectManager->get('Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
+		$sitemapEntryModel            = $objectManager->get('Tollwerk\TwSitemap\Domain\Repository\EntryRepository');
 		
 		$success                      = true;
 

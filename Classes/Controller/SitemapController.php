@@ -138,7 +138,6 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	public function pluginAction($plugin = null) {
 		header('Content-Type: text/xml; charset=utf-8');
 		
-		/*Tx_Extbase_Utility_TypoScript*/
 		$typoscriptService					= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
 		$this->_entriesConfiguration		= array_key_exists('entries', $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
 		$plugin								= strval($plugin);
@@ -169,7 +168,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 			if (strlen($parameterName) && strlen($parameterType) && array_key_exists($parameterType, self::$_pluginParameterTypeCallbacks)) {
 				$parameters[$parameterName]			= call_user_func(array($this, self::$_pluginParameterTypeCallbacks[$parameterType]), $parameter, $this->_entriesConfiguration["$plugin."]);
 				$this->view->assign('parameters', $parameters);
-				die($this->render());
+				die($this->view->render());
 				
 			} else {
 				exit;
@@ -193,7 +192,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 	 */
 	protected function _getParameterValuesRepository($config, $pluginConfig) {
 		$values						= array();
-		$objectManager				= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('\TYPO3\CMS\Extbase\Object\ObjectManager');
+		$objectManager				= \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
 		$repository					= $objectManager->get($config['repository']);
 		if ($repository instanceof \TYPO3\CMS\Extbase\Persistence\Repository) {
 			$repositoryConfig		= array_key_exists('repository.', $config) ? (array)$config['repository.'] : array();
