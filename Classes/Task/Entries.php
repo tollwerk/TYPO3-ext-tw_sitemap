@@ -341,8 +341,16 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
 		// Durchlaufen aller enthaltenen A-Elemente
 		/* @var $entry DOMElement */
 		foreach ($xpath->query('//a[@href]') as $entryIndex => $entry) {
-			// Extrahieren des Eintrags-URL
+			
+			// Extrahieren & Normalisieren des Eintrags-URL
 			$loc						= trim($entry->getAttribute('href'));
+			$locParts					= parse_url($loc);
+			$loc						= empty($locParts['port']) ? '' : ':'.$locParts['port'];
+			$loc						.= empty($locParts['path']) ? '/' : $locParts['path'];
+			$loc						.= empty($locParts['query']) ? '' : '?'.$locParts['query'];
+			$loc						.= empty($locParts['fragment']) ? '' : '#'.$locParts['fragment'];
+			
+			// Extrahieren der übrigen Parameter
 			$origin						= trim($entry->getAttribute('data-origin'));
 			$origin						= strlen($origin) ? $origin : $defaultOrigin;
 			$source						= trim($entry->getAttribute('data-source'));

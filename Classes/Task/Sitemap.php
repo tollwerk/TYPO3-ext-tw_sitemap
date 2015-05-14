@@ -137,7 +137,9 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		$db								= $GLOBALS['TYPO3_DB'];
 		$sitemapEntriesResult			= $db->exec_SELECTquery('GROUP_CONCAT(loc) AS loc,MAX(lastmod) AS lastmod,MIN(changefreq) AS changefreq,MAX(priority) as priority,GROUP_CONCAT(language) AS language', 'tx_twsitemap_domain_model_entry', 'domain='.$db->fullQuoteStr($sitemapDomain, 'tx_twsitemap_domain_model_entry').' AND deleted=0', 'CONCAT(origin, "~", source)', 'priority DESC, lastmod DESC');
 		if ($sitemapEntriesResult && $db->sql_num_rows($sitemapEntriesResult)) {
+			
 			// Vorbereitungen
+			$sitemapSchemePath			= $sitemap->getScheme().(strlen($sitemapTargetDomain) ? $sitemapTargetDomain : $sitemapDomain);
 			$sitemapGzip				= (boolean)intval($sitemap->getGz());
 			$sitemapFooterLength		= strlen(self::SITEMAP_FOOTER);
 			$sitemapFiles				= array();
@@ -151,10 +153,10 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 				$locs					= explode(',', $sitemapEntryRecord['loc']);
 				
 				// Generieren des XML-Sitemap-Eintrages
-				$sitemapEntry			= '<url><loc>'.htmlspecialchars($locs[0]).'</loc><lastmod>'.date('Y-m-d', $sitemapEntryRecord['lastmod']).'T'.date('H:i:s', $sitemapEntryRecord['lastmod']).'Z</lastmod><changefreq>'.\Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[$sitemapEntryRecord['changefreq']].'</changefreq><priority>'.number_format($sitemapEntryRecord['priority'], 1).'</priority>';
+				$sitemapEntry			= '<url><loc>'.htmlspecialchars($sitemapSchemePath.$locs[0]).'</loc><lastmod>'.date('Y-m-d', $sitemapEntryRecord['lastmod']).'T'.date('H:i:s', $sitemapEntryRecord['lastmod']).'Z</lastmod><changefreq>'.\Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[$sitemapEntryRecord['changefreq']].'</changefreq><priority>'.number_format($sitemapEntryRecord['priority'], 1).'</priority>';
 				if (count($languages) > 1) {
 					foreach ($languages as $index => $language) {
-						$sitemapEntry	.= '<xhtml:link rel="alternate" hreflang="'.htmlspecialchars($language).'" href="'.htmlspecialchars($locs[$index]).'"/>';
+						$sitemapEntry	.= '<xhtml:link rel="alternate" hreflang="'.htmlspecialchars($language).'" href="'.htmlspecialchars($sitemapSchemePath.$locs[$index]).'"/>';
 					}
 				}
 				$sitemapEntry			.= '</url>';
@@ -186,7 +188,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 			
 			// Wenn mehr als eine Sitemap-Datei generiert wurde: Erzeugen eines Sitemap-Index
 			if (count($sitemapFiles) > 1) {
-				$success							= $this->_createSitemapIndex($sitemapTmpDirectory, $sitemapFiles, $sitemapGzip, $sitemap->getScheme().(strlen($sitemapTargetDomain) ? $sitemapTargetDomain : $sitemapDomain).'/typo3temp/tw_sitemap/'.$sitemap->getUid().'/');
+				$success							= $this->_createSitemapIndex($sitemapTmpDirectory, $sitemapFiles, $sitemapGzip, $sitemapSchemePath.'/typo3temp/tw_sitemap/'.$sitemap->getUid().'/');
 				
 			// Ansonsten: Umbenennen der einen Datei
 			} else {
