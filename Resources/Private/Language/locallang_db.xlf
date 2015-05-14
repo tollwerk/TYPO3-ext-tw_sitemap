@@ -57,6 +57,9 @@
 			<trans-unit id="tx_twsitemap_domain_model_entry.priority" xml:space="preserve">
 				<source>Priority</source>
 			</trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.position" xml:space="preserve">
+				<source>Position</source>
+			</trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.language" xml:space="preserve">
 				<source>Language</source>
 			</trans-unit>

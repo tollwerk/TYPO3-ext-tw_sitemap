@@ -135,7 +135,8 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		// Abrufen und Durchlaufen aller Sitemap-Einträge
 		/* @var $db \TYPO3\CMS\Core\Database\DatabaseConnection */
 		$db								= $GLOBALS['TYPO3_DB'];
-		$sitemapEntriesResult			= $db->exec_SELECTquery('GROUP_CONCAT(loc) AS loc,MAX(lastmod) AS lastmod,MIN(changefreq) AS changefreq,MAX(priority) as priority,GROUP_CONCAT(language) AS language', 'tx_twsitemap_domain_model_entry', 'domain='.$db->fullQuoteStr($sitemapDomain, 'tx_twsitemap_domain_model_entry').' AND deleted=0', 'CONCAT(origin, "~", source)', 'priority DESC, lastmod DESC');
+		$db->sql_query('SET SESSION group_concat_max_len = 1000000');
+		$sitemapEntriesResult			= $db->exec_SELECTquery('GROUP_CONCAT(loc ORDER BY position ASC) AS loc,MAX(lastmod) AS lastmod,MIN(changefreq) AS changefreq,MAX(priority) as priority,GROUP_CONCAT(language ORDER BY position ASC) AS language', 'tx_twsitemap_domain_model_entry', 'domain='.$db->fullQuoteStr($sitemapDomain, 'tx_twsitemap_domain_model_entry').' AND deleted=0', 'CONCAT(origin, "~", source)', 'priority DESC, lastmod DESC');
 		if ($sitemapEntriesResult && $db->sql_num_rows($sitemapEntriesResult)) {
 			
 			// Vorbereitungen

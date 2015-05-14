@@ -36,7 +36,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 		'showRecordFieldList' => 'domain, origin, loc, lastmod, changefreq, priority',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'domain, origin, source, language, loc, lastmod, changefreq, priority'),
+		'1' => array('showitem' => 'domain, origin, source, language, loc, lastmod, changefreq, priority, position'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -122,6 +122,15 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
 				'max' => 5,
 				'eval' => 'trim',
 				'checkbox' => 1,
+			),
+		),
+		'position' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.position',
+			'config' => array(
+				'type' => 'input',
+				'size' => 7,
+				'eval' => 'int,required',
 			),
 		),
 		'source' => array(

@@ -91,6 +91,14 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
 	 * @var string
 	 */
 	protected $language;
+
+	/**
+	 * Position
+	 *
+	 * @var int
+	 * @validate NotEmpty
+	 */
+	protected $position;
 	
 	/**
 	 * Source identifier
@@ -290,6 +298,25 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
 	public function setLanguage($language) {
 		$this->language = $language;
 	}
+
+	/**
+	 * Returns the position
+	 *
+	 * @return int $position
+	 */
+	public function getPosition() {
+		return $this->position;
+	}
+	
+	/**
+	 * Sets the position
+	 *
+	 * @param int $position
+	 * @return void
+	 */
+	public function setPosition($position) {
+		$this->position = $position;
+	}
 	
 	/**
 	 * Get the source identifier
@@ -324,5 +351,3 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
 		}
 	}
 }
-
-?>

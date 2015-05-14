@@ -13,6 +13,7 @@ CREATE TABLE tx_twsitemap_domain_model_entry (
 	changefreq int(11) DEFAULT '0' NOT NULL,
 	priority double(11,2) DEFAULT '0.00' NOT NULL,
 	language varchar(5) DEFAULT '' NOT NULL,
+	position int(11) DEFAULT '0' NOT NULL,
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
 	crdate int(11) unsigned DEFAULT '0' NOT NULL,

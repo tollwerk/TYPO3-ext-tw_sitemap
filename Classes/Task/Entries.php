@@ -65,6 +65,12 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
 	 */
 	protected $_cycle = null;
 	/**
+	 * Locale-Indices
+	 * 
+	 * @var \array
+	 */
+	protected $_localeIndices = array();
+	/**
 	 * Konfigurationstyp: Typoscript
 	 *
 	 * @var string
@@ -182,6 +188,7 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
 		$langParam									= trim($settings['lang']);
 		$languages									= (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['languages'])) : array('');
 		$locales									= array_pad((array_key_exists('locales', $config) && strlen(trim($config['locales']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', trim($config['locales'])) : array(), count($languages), '');
+		$this->_localeIndices						= array_flip($locales);
 		
 		// Bestimmen der Eintragsherkunft
 		$origin										= array_key_exists('origin', $config) ? strval($config['origin']) : md5(serialize($config));
@@ -363,7 +370,7 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
 			$priority					= trim($entry->getAttribute('data-priority'));
 			$priority					= strlen($priority) ? floatval($priority) : $defaultPriority;
 			$locale						= trim($entry->getAttribute('data-locale'));
-			$locale						= strlen($locale) ? floatval($locale) : $defaultLocale;
+			$locale						= strlen($locale) ? strval($locale) : $defaultLocale;
 			
 			// Vorbereiten des Eintragsdatensatzes
 			$entry						= array(
@@ -374,6 +381,7 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
 				'changefreq'			=> $changefreq,
 				'priority'				=> $priority,
 				'language'				=> $locale,
+				'position'				=> $this->_localeIndices[$defaultLocale],
 				'lastmod'				=> $lastmod,
 				'tstamp'				=> $this->_cycle,
 				'deleted'				=> 0
