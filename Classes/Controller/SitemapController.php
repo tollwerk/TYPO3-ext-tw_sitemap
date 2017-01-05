@@ -132,7 +132,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         $tsConfig = (strlen($typoscript) && array_key_exists("$typoscript.",
                 $this->_entriesConfiguration) && array_key_exists('entries.',
                 $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
-        $tsResult = is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->COBJ_ARRAY($tsConfig) : '';
+        $tsResult = is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->getContentObject('COA')->render($tsConfig) : '';
         die("<entries>$tsResult</entries>");
         exit;
     }
