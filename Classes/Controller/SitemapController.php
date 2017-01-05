@@ -91,15 +91,16 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
 				}
 			}
 		}
-		
+
 		// Wenn ein geeigneter Sitemap-Eintrag gefunden wurde ...
 		if ($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap) {
 			$sitemapDirectory				= PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
+
 			if (@is_dir($sitemapDirectory)) {
 				$sitemapGzip				= (boolean)intval($sitemap->getGz());
 				$sitemapPath				= $sitemapDirectory.'sitemap.xml'.($sitemapGzip ? '.gz' : '');
 				if (@is_file($sitemapPath) && @is_readable($sitemapPath)) {
-					header('Content-Type: text/xml; charset=utf-8');
+					header('Content-Type: application/xml; charset=utf-8');
 					if ($sitemapGzip) {
 						header('Content-Encoding: gzip');
 					}

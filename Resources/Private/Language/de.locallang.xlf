@@ -1,38 +1,98 @@
 <?xml version='1.0' encoding='utf-8'?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:21Z" product-name="tw_sitemap">
+	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:32Z" product-name="tw_sitemap">
 		<header/>
 		<body>
+			<trans-unit id="pages.palette.searchengines" xml:space="preserve" approved="yes">
+				<source>Search engines</source>
+			<target state="translated">Suchmaschinen</target></trans-unit>
+			<trans-unit id="pages.tx_twsitemap_nofollow" xml:space="preserve" approved="yes">
+				<source>Don't follow links on this page</source>
+			<target state="translated">Links auf dieser Seite nicht verfolgen</target></trans-unit>
+			<trans-unit id="pages.tx_twsitemap_noindex" xml:space="preserve" approved="yes">
+				<source>Don't index this page</source>
+			<target state="signed-off">Diese Seite nicht indizieren</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry" xml:space="preserve" approved="yes">
-				<source>XML sitemap entry</source>
-			<target state="translated">XML-Sitemapeintrag</target></trans-unit>
+				<source>XML Sitemap entry</source>
+			<target state="translated">XML-Sitemap-Eintrag</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.domain" xml:space="preserve" approved="yes">
+				<source>Domain</source>
+			<target state="translated">Domain</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.origin" xml:space="preserve" approved="yes">
 				<source>Origin</source>
 			<target state="translated">Ursprung</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.source" xml:space="preserve" approved="yes">
+				<source>Source ID</source>
+			<target state="translated">Quell-ID</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.loc" xml:space="preserve" approved="yes">
 				<source>URL</source>
 			<target state="translated">URL</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.lastmod" xml:space="preserve" approved="yes">
-				<source>Last modified</source>
+				<source>Last change</source>
 			<target state="translated">Letzte Änderung</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq" xml:space="preserve" approved="yes">
 				<source>Change frequency</source>
 			<target state="translated">Änderungsfrequenz</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.0" xml:space="preserve" approved="yes">
+				<source>Always</source>
+			<target state="translated">Immer</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.1" xml:space="preserve" approved="yes">
+				<source>Hourly</source>
+			<target state="translated">Stündlich</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.2" xml:space="preserve" approved="yes">
+				<source>Daily</source>
+			<target state="translated">Täglich</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.3" xml:space="preserve" approved="yes">
+				<source>Weekly</source>
+			<target state="translated">Wöchentlich</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.4" xml:space="preserve" approved="yes">
+				<source>Monthly</source>
+			<target state="translated">Monatlich</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.5" xml:space="preserve" approved="yes">
+				<source>Yearly</source>
+			<target state="translated">Jährlich</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.changefreq.I.6" xml:space="preserve" approved="yes">
+				<source>Never</source>
+			<target state="translated">Niemals</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.priority" xml:space="preserve" approved="yes">
 				<source>Priority</source>
 			<target state="translated">Priorität</target></trans-unit>
-			<trans-unit id="scheduler.sitemap" xml:space="preserve" approved="yes">
-				<source>XML sitemap generation</source>
-			<target state="translated">XML-Sitemap-Erzeugung</target></trans-unit>
-			<trans-unit id="scheduler.sitemap.description" xml:space="preserve" approved="yes">
-				<source>Scheduler task for the generation / update of registered XML sitemaps</source>
-			<target state="translated">Planer-Aufgabe zur Erzeugung / Aktualisierung von registrierten XML-Sitemaps</target></trans-unit>
-			<trans-unit id="scheduler.entries" xml:space="preserve" approved="yes">
-				<source>XML sitemap entry generation</source>
-			<target state="translated">XML-Sitemap-Eintragserzeugung</target></trans-unit>
-			<trans-unit id="scheduler.entries.description" xml:space="preserve" approved="yes">
-				<source>Scheduler task for the generation / update of XML sitemap entries according to the TypoScript entries configuration</source>
-			<target state="translated">Planer-Aufgabe zur Erzeugung / Aktualisierung von XML-Sitemap-Einträgen anhand der hinterlegten TypoScript-Eintragskonfiguration</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.position" xml:space="preserve" approved="yes">
+				<source>Position</source>
+			<target state="translated">Position</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_entry.language" xml:space="preserve" approved="yes">
+				<source>Language</source>
+			<target state="translated">Sprache</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap" xml:space="preserve" approved="yes">
+				<source>XML Sitemap</source>
+			<target state="translated">XML-Sitemap</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.domain" xml:space="preserve" approved="yes">
+				<source>Domain</source>
+			<target state="translated">Domain</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.target_domain" xml:space="preserve" approved="yes">
+				<source>Alternative target domain (optional)</source>
+			<target state="translated">Alternative Ziel-Domain (optional)</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme" xml:space="preserve" approved="yes">
+				<source>URL scheme</source>
+			<target state="translated">URL-Schema</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme.I.0" xml:space="preserve" approved="yes">
+				<source>HTTP</source>
+			<target state="translated">HTTP</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.scheme.I.1" xml:space="preserve" approved="yes">
+				<source>HTTPS</source>
+			<target state="translated">HTTPS</target></trans-unit>
+			<trans-unit id="tx_twsitemap_domain_model_sitemap.gz" xml:space="preserve" approved="yes">
+				<source>Use GZIP compression</source>
+			<target state="translated">GZIP-Kompression anwenden</target></trans-unit>
+			<trans-unit id="feplugin" xml:space="preserve" approved="yes">
+				<source>XML Sitemap</source>
+			<target state="translated">XML-Sitemap</target></trans-unit>
+			<trans-unit id="scheduler.entries.root" xml:space="preserve" approved="yes">
+				<source>Root page ID</source>
+			<target state="translated">Wurzelseiten-ID</target></trans-unit>
+			<trans-unit id="scheduler.entries.debug" xml:space="preserve" approved="yes">
+				<source>Ouput debugging info</source>
+			<target state="translated">Debuggin-Informationen ausgeben</target></trans-unit>
 		</body>
 	</file>
 </xliff>

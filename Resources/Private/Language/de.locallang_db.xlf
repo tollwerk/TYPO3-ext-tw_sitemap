@@ -7,11 +7,11 @@
 				<source>Search engines</source>
 			<target state="translated">Suchmaschinen</target></trans-unit>
 			<trans-unit id="pages.tx_twsitemap_nofollow" xml:space="preserve" approved="yes">
-				<source>Follow links on this page</source>
-			<target state="translated">Links auf dieser Seite verfolgen</target></trans-unit>
+				<source>Don't follow links on this page</source>
+			<target state="translated">Links auf dieser Seite nicht verfolgen</target></trans-unit>
 			<trans-unit id="pages.tx_twsitemap_noindex" xml:space="preserve" approved="yes">
-				<source>Index this page</source>
-			<target state="translated">Diese Seite indizieren</target></trans-unit>
+				<source>Don't index this page</source>
+			<target state="translated">Diese Seite nicht indizieren</target></trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry" xml:space="preserve" approved="yes">
 				<source>XML Sitemap entry</source>
 			<target state="translated">XML-Sitemap-Eintrag</target></trans-unit>
@@ -92,7 +92,7 @@
 			<target state="translated">Wurzelseiten-ID</target></trans-unit>
 			<trans-unit id="scheduler.entries.debug" xml:space="preserve" approved="yes">
 				<source>Ouput debugging info</source>
-			<target state="translated">Debuggin-Informationen ausgeben</target></trans-unit>
+			<target state="translated">Debugging-Informationen ausgeben</target></trans-unit>
 		</body>
 	</file>
 </xliff>

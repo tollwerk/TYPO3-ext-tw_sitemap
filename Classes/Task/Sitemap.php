@@ -95,7 +95,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		// Durchlaufen aller registrierten XML-Sitemaps
 		/* @var $sitemap \Tollwerk\TwSitemap\Domain\Model\Sitemap */
 		foreach ($sitemapModel->findAll() as $sitemap) {
-			$success                  = $success && $this->_generateSitemap($sitemap);			
+			$success                  = $success && $this->_generateSitemap($sitemap);
 		}
 		
 		return $success;
@@ -138,7 +138,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask  {
 		$db->sql_query('SET SESSION group_concat_max_len = 1000000');
 		$sitemapEntriesResult			= $db->exec_SELECTquery('GROUP_CONCAT(loc ORDER BY position ASC) AS loc,MAX(lastmod) AS lastmod,MIN(changefreq) AS changefreq,MAX(priority) as priority,GROUP_CONCAT(language ORDER BY position ASC) AS language', 'tx_twsitemap_domain_model_entry', 'domain='.$db->fullQuoteStr($sitemapDomain, 'tx_twsitemap_domain_model_entry').' AND deleted=0', 'CONCAT(origin, "~", source)', 'priority DESC, lastmod DESC');
 		if ($sitemapEntriesResult && $db->sql_num_rows($sitemapEntriesResult)) {
-			
+
 			// Vorbereitungen
 			$sitemapSchemePath			= $sitemap->getScheme().(strlen($sitemapTargetDomain) ? $sitemapTargetDomain : $sitemapDomain);
 			$sitemapGzip				= (boolean)intval($sitemap->getGz());

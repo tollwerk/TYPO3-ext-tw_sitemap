@@ -20,5 +20,7 @@ plugin.tx_twsitemap {
 		lang = L 
 		# cat=plugin.tx_twsitemap/e; type=boolean; label=Add robots meta element
 		meta = 1 
+		# cat=plugin.tx_twsitemap/f; type=boolean; label=Enforce HTTPS
+		https = 0
 	}
 }

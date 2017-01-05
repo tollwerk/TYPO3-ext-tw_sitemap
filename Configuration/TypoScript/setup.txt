@@ -11,6 +11,7 @@ plugin.tx_twsitemap {
 		domain						= {$plugin.tx_twsitemap.settings.domain}
 		baseUrl						= {$plugin.tx_twsitemap.settings.baseUrl}
 		lang						= {$plugin.tx_twsitemap.settings.lang}
+		https						= {$plugin.tx_twsitemap.settings.https}
 		entries {
 		
 		}
@@ -24,7 +25,7 @@ xmlSitemap {
 	config {
 		no_cache					= 1
 		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		additionalHeaders			= Content-Type: application/xml; charset=utf-8
 		tx_cooluri_enable			= 1
 	}
 	10								= USER
@@ -58,7 +59,7 @@ xmlSitemapTyposcript {
 	config {
 		no_cache					= 1
 		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		additionalHeaders			= Content-Type: application/xml; charset=utf-8
 		simulateStaticDocuments		= 0
 		tx_cooluri_enable			= 1
 	}
@@ -88,7 +89,7 @@ xmlSitemapPlugin {
 	config {
 		no_cache					= 1
 		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: text/xml; charset=utf-8
+		additionalHeaders			= Content-Type: application/xml; charset=utf-8
 		simulateStaticDocuments		= 0
 		tx_cooluri_enable			= 1
 	}
