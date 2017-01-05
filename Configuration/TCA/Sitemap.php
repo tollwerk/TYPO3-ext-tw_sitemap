@@ -31,7 +31,22 @@ if (!defined('TYPO3_MODE')) {
 }
 
 $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
-    'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap']['ctrl'],
+    'ctrl' => array(
+        'title' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap',
+        'label' => 'domain',
+        'tstamp' => 'tstamp',
+        'crdate' => 'crdate',
+        'cruser_id' => 'cruser_id',
+        'dividers2tabs' => true,
+        'delete' => 'deleted',
+        'enablecolumns' => array(
+            'disabled' => 'hidden',
+            'starttime' => 'starttime',
+            'endtime' => 'endtime',
+        ),
+        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tw_sitemap').'Configuration/TCA/Sitemap.php',
+        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tw_sitemap').'Resources/Public/Icons/tx_twsitemap_domain_model_sitemap.gif'
+    ),
     'interface' => array(
         'showRecordFieldList' => 'domain, target_domain, scheme, gz',
     ),
@@ -129,4 +144,3 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
         ),
     ),
 );
-?>

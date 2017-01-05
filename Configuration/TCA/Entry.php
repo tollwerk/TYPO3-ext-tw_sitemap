@@ -31,7 +31,18 @@ if (!defined('TYPO3_MODE')) {
 }
 
 $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
-    'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_entry']['ctrl'],
+    'ctrl' => array(
+        'title' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry',
+        'label' => 'loc',
+        'tstamp' => 'tstamp',
+        'crdate' => 'crdate',
+        'cruser_id' => 'cruser_id',
+        'dividers2tabs' => true,
+        'delete' => 'deleted',
+        'enablecolumns' => array(),
+        'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tw_sitemap').'Configuration/TCA/Entry.php',
+        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tw_sitemap').'Resources/Public/Icons/tx_twsitemap_domain_model_entry.gif'
+    ),
     'interface' => array(
         'showRecordFieldList' => 'domain, origin, loc, lastmod, changefreq, priority',
     ),
@@ -168,5 +179,3 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
         ),
     ),
 );
-
-?>

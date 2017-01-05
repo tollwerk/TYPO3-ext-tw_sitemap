@@ -39,7 +39,7 @@ if (!defined('TYPO3_MODE')) {
 
 // Register the TypoScript setip
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript',
-    'tollwerk® XML Sitemap');
+    'tollwerk XML Sitemap');
 
 // Register the sitemap entry table
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_twsitemap_domain_model_entry',
