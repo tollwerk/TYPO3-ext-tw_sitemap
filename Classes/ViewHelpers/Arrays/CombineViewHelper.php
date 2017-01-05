@@ -5,7 +5,7 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -30,16 +30,16 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
 
 /**
  * View-Helper zur dynamischen Array-Erzeugung
- * 
+ *
  * = Examples =
- * 
+ *
  * <code title="Basic usage">
  * <tw:arrays.combine keys="{0: 'key1', 1: 'key2'}" values="{0: 1, 1: 2}" />
  * </code>
  * <output>
  * Array mit den übergebenen Schlüssel und zugehörigen Werten
  * </output>
- * 
+ *
  * <code title="Inline notation">
  * {tw:arrays.combine(keys: {0: 'key1', 1: 'key2'}, values: {0: 1, 1: 2})}
  * </code>
@@ -48,19 +48,19 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class CombineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper {
+class CombineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+{
 
-	/**
-	 * Kombiniert einen dynamischen Array aus Schlüsseln und Werten
-	 *
-	 * @param array $keys				Schlüssel
-	 * @param array $index				Werte
-	 * @return array					Kombinierter Array			
-	 */
-	public function render(array $keys, array $values) {
-		$count			= min(count($keys), count($values));
-		return array_combine(array_slice($keys, 0, $count), array_slice($values, 0, $count));
-	}
+    /**
+     * Kombiniert einen dynamischen Array aus Schlüsseln und Werten
+     *
+     * @param array $keys Schlüssel
+     * @param array $index Werte
+     * @return array                    Kombinierter Array
+     */
+    public function render(array $keys, array $values)
+    {
+        $count = min(count($keys), count($values));
+        return array_combine(array_slice($keys, 0, $count), array_slice($values, 0, $count));
+    }
 }
-
-?>

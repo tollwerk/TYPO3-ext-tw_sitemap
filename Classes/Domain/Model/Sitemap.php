@@ -5,7 +5,7 @@ namespace Tollwerk\TwSitemap\Domain\Model;
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -35,121 +35,123 @@ namespace Tollwerk\TwSitemap\Domain\Model;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Sitemap extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity {
+class Sitemap extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+{
+    /**
+     * Domain
+     *
+     * @var string
+     * @validate NotEmpty
+     */
+    protected $domain;
 
-	/**
-	 * Domain
-	 *
-	 * @var string
-	 * @validate NotEmpty
-	 */
-	protected $domain;
-	
-	/**
-	 * Alternative Ziel-Domain
-	 *
-	 * @var string
-	 */
-	protected $targetDomain;
-	
-	/**
-	 * Scheme
-	 *
-	 * @var string
-	 * @validate NotEmpty
-	 */
-	protected $scheme;
+    /**
+     * Alternative Ziel-Domain
+     *
+     * @var string
+     */
+    protected $targetDomain;
 
-	/**
-	 * File name
-	 *
-	 * @var string
-	 * @validate NotEmpty
-	 */
-	protected $filename;
-	
-	/**
-	 * GZIP-Kompression
-	 * 
-	 * @var boolean
-	 */
-	protected $gz;
-	
-	/**
-	 * Konstruktor
-	 *
-	 * @return void
-	 */
-	public function __construct() {}
+    /**
+     * Scheme
+     *
+     * @var string
+     * @validate NotEmpty
+     */
+    protected $scheme;
 
-	/**
-	 * @return the $gz
-	 */
-	public function getGz() {
-		return $this->gz;
-	}
+    /**
+     * File name
+     *
+     * @var string
+     * @validate NotEmpty
+     */
+    protected $filename;
 
-	/**
-	 * @param boolean $gz
-	 */
-	public function setGz($gz) {
-		$this->gz = $gz;
-	}
+    /**
+     * GZIP-Kompression
+     *
+     * @var boolean
+     */
+    protected $gz;
 
-	/**
-	 * @return the $domain
-	 */
-	public function getDomain() {
-		return $this->domain;
-	}
+    /**
+     * @return the $gz
+     */
+    public function getGz()
+    {
+        return $this->gz;
+    }
 
-	/**
-	 * @return the $scheme
-	 */
-	public function getScheme() {
-		return $this->scheme;
-	}
+    /**
+     * @param boolean $gz
+     */
+    public function setGz($gz)
+    {
+        $this->gz = $gz;
+    }
 
-	/**
-	 * @return the $filename
-	 */
-	public function getFilename() {
-		return $this->filename;
-	}
+    /**
+     * @return the $domain
+     */
+    public function getDomain()
+    {
+        return $this->domain;
+    }
 
-	/**
-	 * @param string $domain
-	 */
-	public function setDomain($domain) {
-		$this->domain = $domain;
-	}
+    /**
+     * @return the $scheme
+     */
+    public function getScheme()
+    {
+        return $this->scheme;
+    }
 
-	/**
-	 * @param string $scheme
-	 */
-	public function setScheme($scheme) {
-		$this->scheme = $scheme;
-	}
+    /**
+     * @return the $filename
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
 
-	/**
-	 * @param string $filename
-	 */
-	public function setFilename($filename) {
-		$this->filename = $filename;
-	}
-	/**
-	 * @return the $targetDomain
-	 */
-	public function getTargetDomain() {
-		return $this->targetDomain;
-	}
+    /**
+     * @param string $domain
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+    }
 
-	/**
-	 * @param string $targetDomain
-	 */
-	public function setTargetDomain($targetDomain) {
-		$this->targetDomain = $targetDomain;
-	}
+    /**
+     * @param string $scheme
+     */
+    public function setScheme($scheme)
+    {
+        $this->scheme = $scheme;
+    }
+
+    /**
+     * @param string $filename
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+    }
+
+    /**
+     * @return the $targetDomain
+     */
+    public function getTargetDomain()
+    {
+        return $this->targetDomain;
+    }
+
+    /**
+     * @param string $targetDomain
+     */
+    public function setTargetDomain($targetDomain)
+    {
+        $this->targetDomain = $targetDomain;
+    }
 }
-
-?>

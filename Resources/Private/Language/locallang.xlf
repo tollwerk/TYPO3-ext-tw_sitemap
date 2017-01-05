@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:21Z" product-name="tw_sitemap">
-		<header/>
-		<body>
-			<trans-unit id="tx_twsitemap_domain_model_entry" xml:space="preserve">
+    <file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:21Z"
+          product-name="tw_sitemap">
+        <header/>
+        <body>
+            <trans-unit id="tx_twsitemap_domain_model_entry" xml:space="preserve">
 				<source>XML sitemap entry</source>
 			</trans-unit>
 			<trans-unit id="tx_twsitemap_domain_model_entry.origin" xml:space="preserve">
@@ -33,6 +34,6 @@
 			<trans-unit id="scheduler.entries.description" xml:space="preserve">
 				<source>Scheduler task for the generation / update of XML sitemap entries according to the TypoScript entries configuration</source>
 			</trans-unit>
-		</body>
-	</file>
+        </body>
+    </file>
 </xliff>

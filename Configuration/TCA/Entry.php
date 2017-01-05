@@ -3,7 +3,7 @@
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,126 +26,147 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-if (!defined ('TYPO3_MODE')) {
-	die ('Access denied.');
+if (!defined('TYPO3_MODE')) {
+    die ('Access denied.');
 }
 
 $GLOBALS['TCA']['tx_twsitemap_domain_model_entry'] = array(
-	'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_entry']['ctrl'],
-	'interface' => array(
-		'showRecordFieldList' => 'domain, origin, loc, lastmod, changefreq, priority',
-	),
-	'types' => array(
-		'1' => array('showitem' => 'domain, origin, source, language, loc, lastmod, changefreq, priority, position'),
-	),
-	'palettes' => array(
-		'1' => array('showitem' => ''),
-	),
-	'columns' => array(
-		'domain' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.domain',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'trim,required'
-			),
-		),
-		'origin' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.origin',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'trim,required'
-			),
-		),
-		'loc' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.loc',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'trim,required'
-			),
-		),
-		'lastmod' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.lastmod',
-			'config' => array(
-				'type' => 'input',
-				'size' => 12,
-				'max' => 20,
-				'eval' => 'datetime,required',
-				'checkbox' => 1,
-				'default' => time()
-			),
-		),
-		'changefreq' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq',
-			'config' => array(
-				'type' => 'select',
-				'renderType' => 'selectSingle',
-				'items' => array(
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.0', 0),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.1', 1),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.2', 2),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.3', 3),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.4', 4),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.5', 5),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.6', 6),
-				),
-				'size' => 1,
-				'maxitems' => 1,
-				'eval' => 'required'
-			),
-		),
-		'priority' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.priority',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'double2,required',
-				'range' => array(
-					'lower' => 0,
-					'upper' => 1,
-				),
-			),
-		),
-		'language' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.language',
-			'config' => array(
-				'type' => 'input',
-				'size' => 4,
-				'max' => 5,
-				'eval' => 'trim',
-				'checkbox' => 1,
-			),
-		),
-		'position' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.position',
-			'config' => array(
-				'type' => 'input',
-				'size' => 7,
-				'eval' => 'int,required',
-			),
-		),
-		'source' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.source',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'max' => 32,
-				'eval' => 'trim',
-				'checkbox' => 1,
-			),
-		),
-	),
+    'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_entry']['ctrl'],
+    'interface' => array(
+        'showRecordFieldList' => 'domain, origin, loc, lastmod, changefreq, priority',
+    ),
+    'types' => array(
+        '1' => array('showitem' => 'domain, origin, source, language, loc, lastmod, changefreq, priority, position'),
+    ),
+    'palettes' => array(
+        '1' => array('showitem' => ''),
+    ),
+    'columns' => array(
+        'domain' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.domain',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim,required'
+            ),
+        ),
+        'origin' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.origin',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim,required'
+            ),
+        ),
+        'loc' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.loc',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim,required'
+            ),
+        ),
+        'lastmod' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.lastmod',
+            'config' => array(
+                'type' => 'input',
+                'size' => 12,
+                'max' => 20,
+                'eval' => 'datetime,required',
+                'checkbox' => 1,
+                'default' => time()
+            ),
+        ),
+        'changefreq' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq',
+            'config' => array(
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => array(
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.0',
+                        0
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.1',
+                        1
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.2',
+                        2
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.3',
+                        3
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.4',
+                        4
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.5',
+                        5
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.changefreq.I.6',
+                        6
+                    ),
+                ),
+                'size' => 1,
+                'maxitems' => 1,
+                'eval' => 'required'
+            ),
+        ),
+        'priority' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.priority',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'double2,required',
+                'range' => array(
+                    'lower' => 0,
+                    'upper' => 1,
+                ),
+            ),
+        ),
+        'language' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.language',
+            'config' => array(
+                'type' => 'input',
+                'size' => 4,
+                'max' => 5,
+                'eval' => 'trim',
+                'checkbox' => 1,
+            ),
+        ),
+        'position' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.position',
+            'config' => array(
+                'type' => 'input',
+                'size' => 7,
+                'eval' => 'int,required',
+            ),
+        ),
+        'source' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_entry.source',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'max' => 32,
+                'eval' => 'trim',
+                'checkbox' => 1,
+            ),
+        ),
+    ),
 );
 
 ?>

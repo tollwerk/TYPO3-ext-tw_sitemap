@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:25Z" product-name="tw_sitemap">
-		<header/>
-		<body>
-			<trans-unit id="domain.description" xml:space="preserve">
+    <file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:25Z"
+          product-name="tw_sitemap">
+        <header/>
+        <body>
+            <trans-unit id="domain.description" xml:space="preserve">
 				<source>Domain</source>
 			</trans-unit>
 			<trans-unit id="origin.description" xml:space="preserve">
@@ -21,6 +22,6 @@
 			<trans-unit id="priority.description" xml:space="preserve">
 				<source>Priority</source>
 			</trans-unit>
-		</body>
-	</file>
+        </body>
+    </file>
 </xliff>

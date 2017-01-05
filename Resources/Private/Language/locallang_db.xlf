@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <xliff version="1.0">
-	<file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:32Z" product-name="tw_sitemap">
-		<header/>
-		<body>
-			<trans-unit id="pages.palette.searchengines" xml:space="preserve">
+    <file source-language="en" datatype="plaintext" original="messages" date="2015-01-29T16:50:32Z"
+          product-name="tw_sitemap">
+        <header/>
+        <body>
+            <trans-unit id="pages.palette.searchengines" xml:space="preserve">
 				<source>Search engines</source>
 			</trans-unit>
 			<trans-unit id="pages.tx_twsitemap_nofollow" xml:space="preserve">
@@ -93,6 +94,6 @@
 			<trans-unit id="scheduler.entries.debug" xml:space="preserve">
 				<source>Ouput debugging info</source>
 			</trans-unit>
-		</body>
-	</file>
+        </body>
+    </file>
 </xliff>

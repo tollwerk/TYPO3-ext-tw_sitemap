@@ -5,7 +5,7 @@ namespace Tollwerk\TwSitemap\Domain\Repository;
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -35,18 +35,19 @@ namespace Tollwerk\TwSitemap\Domain\Repository;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class SitemapRepository extends \TYPO3\CMS\Extbase\Persistence\Repository {
-	
-	/**
-	 * Zurückgeben aller registrierten Sitemaps
-	 *
-	 * Diese Methode ignoriert bewusst die storagePid-Einstellung.
-	 *
-	 * @return array 					Alle Sitemaps
-	 */
-	public function findAll() {
-		$query					= $this->createQuery();
-		$query->getQuerySettings()->setRespectStoragePage(false);
-		return $query->execute();
-	}
+class SitemapRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+{
+    /**
+     * Zurückgeben aller registrierten Sitemaps
+     *
+     * Diese Methode ignoriert bewusst die storagePid-Einstellung.
+     *
+     * @return array                    Alle Sitemaps
+     */
+    public function findAll()
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        return $query->execute();
+    }
 }

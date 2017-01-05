@@ -3,7 +3,7 @@
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,101 +26,107 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-if (!defined ('TYPO3_MODE')) {
-	die ('Access denied.');
+if (!defined('TYPO3_MODE')) {
+    die ('Access denied.');
 }
 
 $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
-	'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap']['ctrl'],
-	'interface' => array(
-		'showRecordFieldList' => 'domain, target_domain, scheme, gz',
-	),
-	'types' => array(
-		'1' => array('showitem' => 'domain, target_domain, scheme, gz'),
-	),
-	'palettes' => array(
-		'1' => array('showitem' => ''),
-	),
-	'columns' => array(
-		'hidden' => array(
-			'exclude' => 1,
-			'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.hidden',
-			'config' => array(
-				'type' => 'check',
-			),
-		),
-		'starttime' => array(
-			'exclude' => 1,
-			'l10n_mode' => 'mergeIfNotBlank',
-			'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.starttime',
-			'config' => array(
-				'type' => 'input',
-				'size' => 13,
-				'max' => 20,
-				'eval' => 'datetime',
-				'checkbox' => 0,
-				'default' => 0,
-				'range' => array(
-					'lower' => mktime(0, 0, 0, date('m'), date('d'), date('Y'))
-				),
-			),
-		),
-		'endtime' => array(
-			'exclude' => 1,
-			'l10n_mode' => 'mergeIfNotBlank',
-			'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.endtime',
-			'config' => array(
-				'type' => 'input',
-				'size' => 13,
-				'max' => 20,
-				'eval' => 'datetime',
-				'checkbox' => 0,
-				'default' => 0,
-				'range' => array(
-					'lower' => mktime(0, 0, 0, date('m'), date('d'), date('Y'))
-				),
-			),
-		),
-		'domain' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.domain',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'trim,required'
-			),
-		),
-		'target_domain' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.target_domain',
-			'config' => array(
-				'type' => 'input',
-				'size' => 30,
-				'eval' => 'trim'
-			),
-		),
-		'scheme' => array(
-			'exclude' => 0,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme',
-			'config' => array(
-				'type' => 'select',
-				'renderType' => 'selectSingle',
-				'items' => array(
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.0', 'http://'),
-					array('LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.1', 'https://'),
-				),
-				'size' => 1,
-				'maxitems' => 1,
-				'eval' => 'required'
-			),
-		),
-		'gz' => array(
-			'exclude' => 1,
-			'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.gz',
-			'config' => array(
-				'type' => 'check',
-			),
-		),
-	),
+    'ctrl' => $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap']['ctrl'],
+    'interface' => array(
+        'showRecordFieldList' => 'domain, target_domain, scheme, gz',
+    ),
+    'types' => array(
+        '1' => array('showitem' => 'domain, target_domain, scheme, gz'),
+    ),
+    'palettes' => array(
+        '1' => array('showitem' => ''),
+    ),
+    'columns' => array(
+        'hidden' => array(
+            'exclude' => 1,
+            'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.hidden',
+            'config' => array(
+                'type' => 'check',
+            ),
+        ),
+        'starttime' => array(
+            'exclude' => 1,
+            'l10n_mode' => 'mergeIfNotBlank',
+            'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.starttime',
+            'config' => array(
+                'type' => 'input',
+                'size' => 13,
+                'max' => 20,
+                'eval' => 'datetime',
+                'checkbox' => 0,
+                'default' => 0,
+                'range' => array(
+                    'lower' => mktime(0, 0, 0, date('m'), date('d'), date('Y'))
+                ),
+            ),
+        ),
+        'endtime' => array(
+            'exclude' => 1,
+            'l10n_mode' => 'mergeIfNotBlank',
+            'label' => 'LLL:EXT:lang/locallang_general.xml:LGL.endtime',
+            'config' => array(
+                'type' => 'input',
+                'size' => 13,
+                'max' => 20,
+                'eval' => 'datetime',
+                'checkbox' => 0,
+                'default' => 0,
+                'range' => array(
+                    'lower' => mktime(0, 0, 0, date('m'), date('d'), date('Y'))
+                ),
+            ),
+        ),
+        'domain' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.domain',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim,required'
+            ),
+        ),
+        'target_domain' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.target_domain',
+            'config' => array(
+                'type' => 'input',
+                'size' => 30,
+                'eval' => 'trim'
+            ),
+        ),
+        'scheme' => array(
+            'exclude' => 0,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme',
+            'config' => array(
+                'type' => 'select',
+                'renderType' => 'selectSingle',
+                'items' => array(
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.0',
+                        'http://'
+                    ),
+                    array(
+                        'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.scheme.I.1',
+                        'https://'
+                    ),
+                ),
+                'size' => 1,
+                'maxitems' => 1,
+                'eval' => 'required'
+            ),
+        ),
+        'gz' => array(
+            'exclude' => 1,
+            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:tx_twsitemap_domain_model_sitemap.gz',
+            'config' => array(
+                'type' => 'check',
+            ),
+        ),
+    ),
 );
 ?>

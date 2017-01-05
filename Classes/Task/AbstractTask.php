@@ -5,7 +5,7 @@ namespace Tollwerk\TwSitemap\Task;
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2015 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -35,20 +35,23 @@ namespace Tollwerk\TwSitemap\Task;
  * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
-	/**
-	 * Add a flash message
-	 *
-	 * @param \string $message		Message
-	 * @param \integer $severity 	Severity
-	 * @return void
-	 */
-	public function addMessage($message, $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK) {
-		$flashMessage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessage', $message, '', $severity);
-		/** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
-		$flashMessageService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
-		/** @var $defaultFlashMessageQueue \TYPO3\CMS\Core\Messaging\FlashMessageQueue */
-		$defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
-		$defaultFlashMessageQueue->enqueue($flashMessage);
-	}
+abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
+{
+    /**
+     * Add a flash message
+     *
+     * @param \string $message Message
+     * @param \integer $severity Severity
+     * @return void
+     */
+    public function addMessage($message, $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK)
+    {
+        $flashMessage = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessage',
+            $message, '', $severity);
+        /** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
+        $flashMessageService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
+        /** @var $defaultFlashMessageQueue \TYPO3\CMS\Core\Messaging\FlashMessageQueue */
+        $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
+        $defaultFlashMessageQueue->enqueue($flashMessage);
+    }
 }

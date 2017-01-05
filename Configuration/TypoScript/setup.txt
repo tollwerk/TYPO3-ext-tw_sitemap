@@ -1,138 +1,143 @@
 plugin.tx_twsitemap {
-	view {
-		templateRootPath			= {$plugin.tx_twsitemap.view.templateRootPath}
-		partialRootPath				= {$plugin.tx_twsitemap.view.partialRootPath}
-		layoutRootPath				= {$plugin.tx_twsitemap.view.layoutRootPath}
-	}
-	persistence {
-		storagePid					= {$plugin.tx_twsitemap.persistence.storagePid}
-	}
-	settings {
-		domain						= {$plugin.tx_twsitemap.settings.domain}
-		baseUrl						= {$plugin.tx_twsitemap.settings.baseUrl}
-		lang						= {$plugin.tx_twsitemap.settings.lang}
-		https						= {$plugin.tx_twsitemap.settings.https}
-		entries {
-		
-		}
-	}
+    view {
+        templateRootPath = {$plugin.tx_twsitemap.view.templateRootPath}
+        partialRootPath = {$plugin.tx_twsitemap.view.partialRootPath}
+        layoutRootPath = {$plugin.tx_twsitemap.view.layoutRootPath}
+    }
+
+    persistence {
+        storagePid = {$plugin.tx_twsitemap.persistence.storagePid}
+    }
+
+    settings {
+        domain = {$plugin.tx_twsitemap.settings.domain}
+        baseUrl = {$plugin.tx_twsitemap.settings.baseUrl}
+        lang = {$plugin.tx_twsitemap.settings.lang}
+        https = {$plugin.tx_twsitemap.settings.https}
+        entries {
+
+        }
+    }
 }
 
-# XML-Sitemap
-xmlSitemap							= PAGE
+# XML SITEMAP
+xmlSitemap = PAGE
 xmlSitemap {
-	typeNum							= 1210
-	config {
-		no_cache					= 1
-		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: application/xml; charset=utf-8
-		tx_cooluri_enable			= 1
-	}
-	10								= USER
-	10 {
-		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
-		settings					< plugin.tx_twsitemap.settings
-		persistence					< plugin.tx_twsitemap.persistence
-		view						< plugin.tx_twsitemap.view
-		vendorName					= Tollwerk
-		pluginName					= Sitemap
-		extensionName				= TwSitemap
-		controller					= Sitemap
-		action						= index
-		switchableControllerActions {
-			Sitemap {
-				1					= index
-			}
-		}    
-	}
+    typeNum = 1210
+    config {
+        no_cache = 1
+        disableAllHeaderCode = 1
+        additionalHeaders = Content-Type: application/xml; charset=utf-8
+        tx_cooluri_enable = 1
+    }
+
+    10 = USER
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        settings < plugin.tx_twsitemap.settings
+        persistence < plugin.tx_twsitemap.persistence
+        view < plugin.tx_twsitemap.view
+        vendorName = Tollwerk
+        pluginName = Sitemap
+        extensionName = TwSitemap
+        controller = Sitemap
+        action = index
+        switchableControllerActions {
+            Sitemap {
+                1 = index
+            }
+        }
+    }
 }
 
-# XML-Sitemap (komprimiert)
-xmlSitemapGz						= PAGE
-xmlSitemapGz						< xmlSitemap
-xmlSitemapGz.typeNum				= 1211
+# XML SITEMAP (COMPRESSED)
+xmlSitemapGz = PAGE
+xmlSitemapGz < xmlSitemap
+xmlSitemapGz.typeNum = 1211
 
-# TypoScript-Einträge
-xmlSitemapTyposcript				= PAGE
+# TYPOSCRIPT ENTRIES
+xmlSitemapTyposcript = PAGE
 xmlSitemapTyposcript {
-	typeNum							= 1212
-	config {
-		no_cache					= 1
-		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: application/xml; charset=utf-8
-		simulateStaticDocuments		= 0
-		tx_cooluri_enable			= 1
-	}
-	10								= USER
-	10 {
-		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
-		settings					< plugin.tx_twsitemap.settings
-		persistence					< plugin.tx_twsitemap.persistence
-		view						< plugin.tx_twsitemap.view
-		vendorName					= Tollwerk
-		pluginName					= Sitemap
-		extensionName				= TwSitemap
-		controller					= Sitemap
-		action						= typoscript
-		switchableControllerActions {
-			Sitemap {
-				1					= typoscript
-			}
-		}    
-	}
+    typeNum = 1212
+    config {
+        no_cache = 1
+        disableAllHeaderCode = 1
+        additionalHeaders = Content-Type: application/xml; charset=utf-8
+        simulateStaticDocuments = 0
+        tx_cooluri_enable = 1
+    }
+
+    10 = USER
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        settings < plugin.tx_twsitemap.settings
+        persistence < plugin.tx_twsitemap.persistence
+        view < plugin.tx_twsitemap.view
+        vendorName = Tollwerk
+        pluginName = Sitemap
+        extensionName = TwSitemap
+        controller = Sitemap
+        action = typoscript
+        switchableControllerActions {
+            Sitemap {
+                1 = typoscript
+            }
+        }
+    }
 }
 
-# Plugin-Einträge
-xmlSitemapPlugin					= PAGE
+# PLUGIN ENTRIES
+xmlSitemapPlugin = PAGE
 xmlSitemapPlugin {
-	typeNum							= 1213
-	config {
-		no_cache					= 1
-		disableAllHeaderCode		= 1
-		additionalHeaders			= Content-Type: application/xml; charset=utf-8
-		simulateStaticDocuments		= 0
-		tx_cooluri_enable			= 1
-	}
-	10								= USER
-	10 {
-		userFunc					= TYPO3\CMS\Extbase\Core\Bootstrap->run
-		settings					< plugin.tx_twsitemap.settings
-		persistence					< plugin.tx_twsitemap.persistence
-		view						< plugin.tx_twsitemap.view
-		vendorName					= Tollwerk
-		pluginName					= Sitemap
-		extensionName				= TwSitemap
-		controller					= Sitemap
-		action						= plugin
-		switchableControllerActions {
-			Sitemap {
-				1					= plugin
-			}
-		}    
-	}
+    typeNum = 1213
+    config {
+        no_cache = 1
+        disableAllHeaderCode = 1
+        additionalHeaders = Content-Type: application/xml; charset=utf-8
+        simulateStaticDocuments = 0
+        tx_cooluri_enable = 1
+    }
+
+    10 = USER
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        settings < plugin.tx_twsitemap.settings
+        persistence < plugin.tx_twsitemap.persistence
+        view < plugin.tx_twsitemap.view
+        vendorName = Tollwerk
+        pluginName = Sitemap
+        extensionName = TwSitemap
+        controller = Sitemap
+        action = plugin
+        switchableControllerActions {
+            Sitemap {
+                1 = plugin
+            }
+        }
+    }
 }
 
 # ADD ROBOTS META ELEMENT
 [globalVar = LIT:1 = {$plugin.tx_twsitemap.settings.meta}]
-	page.meta.robots.cObject		= COA
-	page.meta.robots.cObject {
-		10							= CASE
-		10 {
-			key.field				= tx_twsitemap_nofollow
-			1						= TEXT
-			1.value					= nofollow
-			default					= TEXT
-			default.value			= follow
-			stdWrap.noTrimWrap		= ||, |
-		}
-		
-		20							= CASE
-		20 {
-			key.field				= tx_twsitemap_noindex
-			1						= TEXT
-			1.value					= noindex
-			default					= TEXT
-			default.value			= index
-		}
-	}
+    page.meta.robots.cObject = COA
+    page.meta.robots.cObject {
+        10 = CASE
+        10 {
+            key.field = tx_twsitemap_nofollow
+            1 = TEXT
+            1.value = nofollow
+            default = TEXT
+            default.value = follow
+            stdWrap.noTrimWrap = ||, |
+        }
+
+        20 = CASE
+        20 {
+            key.field = tx_twsitemap_noindex
+            1 = TEXT
+            1.value = noindex
+            default = TEXT
+            default.value = index
+        }
+    }
 [global]

@@ -1,0 +1,30 @@
+{
+  "name": "tollwerk/tw-sitemap",
+  "type": "typo3-cms-extension",
+  "description": "Advanced Google XML Sitemap generation incl. various entry sources and multiple sitemap file support",
+  "authors": [
+    {
+      "name": "Joschi Kuphal",
+      "email": "joschi@tollwerk.de"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://composer.typo3.org/"
+    }
+  ],
+  "require": {
+    "typo3/cms": "*"
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Tollwerk\\TwSitemap\\": "Classes/"
+    }
+  }
+}
