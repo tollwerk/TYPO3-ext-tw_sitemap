@@ -45,7 +45,7 @@ $GLOBALS['TCA']['tx_twsitemap_domain_model_sitemap'] = array(
             'endtime' => 'endtime',
         ),
         'dynamicConfigFile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tw_sitemap').'Configuration/TCA/Sitemap.php',
-        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('tw_sitemap').'Resources/Public/Icons/tx_twsitemap_domain_model_sitemap.gif'
+        'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('tw_sitemap').'Resources/Public/Icons/tx_twsitemap_domain_model_sitemap.gif'
     ),
     'interface' => array(
         'showRecordFieldList' => 'domain, target_domain, scheme, gz',
