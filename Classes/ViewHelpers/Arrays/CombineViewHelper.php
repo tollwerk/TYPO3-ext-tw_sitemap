@@ -2,10 +2,12 @@
 
 namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
 
+use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
+
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -29,7 +31,7 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
  ***************************************************************/
 
 /**
- * View-Helper zur dynamischen Array-Erzeugung
+ * Viewhelper for dynamically creating arrays
  *
  * = Examples =
  *
@@ -37,7 +39,7 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
  * <tw:arrays.combine keys="{0: 'key1', 1: 'key2'}" values="{0: 1, 1: 2}" />
  * </code>
  * <output>
- * Array mit den übergebenen Schlüssel und zugehörigen Werten
+ * Arrays with given keys and values
  * </output>
  *
  * <code title="Inline notation">
@@ -45,22 +47,23 @@ namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
  * </code>
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class CombineViewHelper extends \TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper
+class CombineViewHelper extends AbstractViewHelper
 {
-
     /**
-     * Kombiniert einen dynamischen Array aus Schlüsseln und Werten
+     * Combines array and keys to a new array
      *
-     * @param array $keys Schlüssel
-     * @param array $index Werte
-     * @return array                    Kombinierter Array
+     * @param array $keys  Keys
+     * @param array $index Values
+     *
+     * @return array Combined array
      */
-    public function render(array $keys, array $values)
+    public function render(array $keys, array $values): array
     {
         $count = min(count($keys), count($values));
+
         return array_combine(array_slice($keys, 0, $count), array_slice($values, 0, $count));
     }
 }

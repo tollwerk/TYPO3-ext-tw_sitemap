@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Domain\Model;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,14 +26,18 @@ namespace Tollwerk\TwSitemap\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Domain\Model;
+
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 /**
- * Modellklasse für XML-Sitemap-Einträge
+ * XML sitemap entries
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Entry extends AbstractEntity
 {
     /**
      * Domain
@@ -64,7 +66,7 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Last modified
      *
-     * @var DateTime
+     * @var \DateTime
      * @validate NotEmpty
      */
     protected $lastmod;
@@ -72,7 +74,7 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Change frequency
      *
-     * @var integer
+     * @var int
      * @validate NotEmpty
      */
     protected $changefreq;
@@ -108,75 +110,79 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $source;
 
     /**
-     * Änderungsfrequenzen
+     * Change frequencies
      *
      * @var array
      */
     public static $changefreqs = array(
-        self::CHANGEFREQ_ALWAYS => 'always',
-        self::CHANGEFREQ_HOURLY => 'hourly',
-        self::CHANGEFREQ_DAILY => 'daily',
-        self::CHANGEFREQ_WEEKLY => 'weekly',
+        self::CHANGEFREQ_ALWAYS  => 'always',
+        self::CHANGEFREQ_HOURLY  => 'hourly',
+        self::CHANGEFREQ_DAILY   => 'daily',
+        self::CHANGEFREQ_WEEKLY  => 'weekly',
         self::CHANGEFREQ_MONTHLY => 'monthly',
-        self::CHANGEFREQ_YEARLY => 'yearly',
-        self::CHANGEFREQ_NEVER => 'never',
+        self::CHANGEFREQ_YEARLY  => 'yearly',
+        self::CHANGEFREQ_NEVER   => 'never',
     );
 
     /**
-     * Ständige Aktualisierung
+     * Constant change
      *
      * @var int
      */
     const CHANGEFREQ_ALWAYS = 0;
     /**
-     * Stündliche Aktualisierung
+     * Hourly change
      *
      * @var int
      */
     const CHANGEFREQ_HOURLY = 1;
     /**
-     * Tägliche Aktualisierung
+     * Daily change
      *
      * @var int
      */
     const CHANGEFREQ_DAILY = 2;
     /**
-     * Wöchentliche Aktualisierung
+     * Weekly change
      *
      * @var int
      */
     const CHANGEFREQ_WEEKLY = 3;
     /**
-     * Monatliche Aktualisierung
+     * Monthly change
      *
      * @var int
      */
     const CHANGEFREQ_MONTHLY = 4;
     /**
-     * Jährliche Aktualisierung
+     * Yearly change
      *
      * @var int
      */
     const CHANGEFREQ_YEARLY = 5;
     /**
-     * Keine Aktualisierung
+     * No change
      *
      * @var int
      */
     const CHANGEFREQ_NEVER = 6;
 
     /**
-     * @return the $domain
+     * Return the domain
+     *
+     * @return string Domain
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
-     * @param string $domain
+     * Set the domain
+     *
+     * @param string $domain Domain
      */
-    public function setDomain($domain)
+    public function setDomain(string $domain): void
     {
         $this->domain = $domain;
     }
@@ -184,9 +190,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the origin
      *
-     * @return string $origin
+     * @return string Origin
      */
-    public function getOrigin()
+    public function getOrigin(): string
     {
         return $this->origin;
     }
@@ -194,10 +200,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the origin
      *
-     * @param string $origin
-     * @return void
+     * @param string $origin Origin
      */
-    public function setOrigin($origin)
+    public function setOrigin(string $origin): void
     {
         $this->origin = $origin;
     }
@@ -205,9 +210,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the loc
      *
-     * @return string $loc
+     * @return string Loc
      */
-    public function getLoc()
+    public function getLoc(): string
     {
         return $this->loc;
     }
@@ -215,10 +220,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the loc
      *
-     * @param string $loc
-     * @return void
+     * @param string $loc Loc
      */
-    public function setLoc($loc)
+    public function setLoc(string $loc): void
     {
         $this->loc = $loc;
     }
@@ -226,9 +230,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the lastmod
      *
-     * @return DateTime $lastmod
+     * @return \DateTime Last modification
      */
-    public function getLastmod()
+    public function getLastmod(): \DateTime
     {
         return $this->lastmod;
     }
@@ -236,10 +240,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the lastmod
      *
-     * @param DateTime $lastmod
-     * @return void
+     * @param \DateTime $lastmod Last modification
      */
-    public function setLastmod($lastmod)
+    public function setLastmod(\DateTime $lastmod): void
     {
         $this->lastmod = $lastmod;
     }
@@ -247,9 +250,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the changefreq
      *
-     * @return integer $changefreq
+     * @return int Change frequency
      */
-    public function getChangefreq()
+    public function getChangefreq(): int
     {
         return $this->changefreq;
     }
@@ -257,10 +260,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the changefreq
      *
-     * @param integer $changefreq
-     * @return void
+     * @param int $changefreq Change frequency
      */
-    public function setChangefreq($changefreq)
+    public function setChangefreq(int $changefreq): void
     {
         $this->changefreq = $changefreq;
     }
@@ -268,9 +270,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the priority
      *
-     * @return float $priority
+     * @return float Priority
      */
-    public function getPriority()
+    public function getPriority(): float
     {
         return $this->priority;
     }
@@ -278,20 +280,19 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the priority
      *
-     * @param float $priority
-     * @return void
+     * @param float $priority Priority
      */
-    public function setPriority($priority)
+    public function setPriority(float $priority): void
     {
         $this->priority = $priority;
     }
 
     /**
-     * Gets the language
+     * Returns the language
      *
-     * @return string
+     * @return string Language
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -299,9 +300,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the language
      *
-     * @param string $language
+     * @param string $language Language
      */
-    public function setLanguage($language)
+    public function setLanguage(string $language): void
     {
         $this->language = $language;
     }
@@ -309,9 +310,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Returns the position
      *
-     * @return int $position
+     * @return int Position
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -319,20 +320,19 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Sets the position
      *
-     * @param int $position
-     * @return void
+     * @param int $position Position
      */
-    public function setPosition($position)
+    public function setPosition(int $position): void
     {
         $this->position = $position;
     }
 
     /**
-     * Get the source identifier
+     * Returns the source identifier
      *
-     * @return string
+     * @return string Source identifier
      */
-    public function getSource()
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -340,9 +340,9 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     /**
      * Set the source identifier
      *
-     * @param string $source
+     * @param string $source Source identifier
      */
-    public function setSource($source)
+    public function setSource(string $source): void
     {
         $this->source = $source;
     }
@@ -351,9 +351,8 @@ class Entry extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
      * Setting several properties at once
      *
      * @param array $data Data array
-     * @return void
      */
-    public function setFromArray(array $data)
+    public function setFromArray(array $data): void
     {
         foreach ($data as $key => $value) {
             $setter = 'set'.ucfirst(strtolower($key));

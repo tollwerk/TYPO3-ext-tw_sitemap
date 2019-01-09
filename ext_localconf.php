@@ -3,7 +3,7 @@
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,6 +26,8 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
@@ -33,7 +35,7 @@ if (!defined('TYPO3_MODE')) {
 $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCONF);
 
 // Configure the sitemap plugin
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+ExtensionUtility::configurePlugin(
     'Tollwerk.'.
     $_EXTKEY,
     'Sitemap',
@@ -47,13 +49,16 @@ $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCON
 
 // Register the scheduler tasks
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Sitemap'] = array(
-    'extension' => $_EXTKEY,
-    'title' => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap',
+    'extension'   => $_EXTKEY,
+    'title'       => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap',
     'description' => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap.description',
 );
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Entries'] = array(
-    'extension' => $_EXTKEY,
-    'title' => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
-    'description' => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
+    'extension'        => $_EXTKEY,
+    'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
+    'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
     'additionalFields' => 'Tollwerk\\TwSitemap\\Task\\Entries',
 );
+
+$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[typoscript]';
+$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[plugin]';

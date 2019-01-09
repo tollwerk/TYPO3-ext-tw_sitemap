@@ -3,7 +3,7 @@
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -26,65 +26,39 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
+
 if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
 
-// Register the sitemap plugin
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-    $_EXTKEY,
-    'Sitemap',
-    'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:feplugin'
-);
+call_user_func(
+    function() {
+        // Register the TypoScript setup
+        ExtensionManagementUtility::addStaticFile('tw_sitemap', 'Configuration/TypoScript', 'tollwerk XML Sitemap');
 
-// Register the TypoScript setip
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript',
-    'tollwerk XML Sitemap');
+        // Allow records on standard files
+        ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_entry');
+        ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_sitemap');
 
-// Register the sitemap entry table
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_twsitemap_domain_model_entry',
-    'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_entry.xlf');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_entry');
+        // Register the sitemap entry table
+        ExtensionManagementUtility::addLLrefForTCAdescr(
+            'tx_twsitemap_domain_model_entry',
+            'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_entry.xlf'
+        );
 
-// Register the sitemap table
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr('tx_twsitemap_domain_model_sitemap',
-    'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_sitemap.xlf');
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_sitemap');
+        // Register the sitemap table
+        ExtensionManagementUtility::addLLrefForTCAdescr(
+            'tx_twsitemap_domain_model_sitemap',
+            'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_sitemap.xlf'
+        );
 
-// Load the pages TCA if TYPO3 version < 6.1
-if (version_compare(TYPO3_version, '6.1.0', 'lt')) {
-    \TYPO3\CMS\Core\Utility\GeneralUtility::loadTCA('pages');
-}
-
-// Register the nofollow page property
-$TCA['pages']['columns']['tx_twsitemap_nofollow'] = array(
-    'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:pages.tx_twsitemap_nofollow',
-    'config' => Array(
-        'type' => 'check',
-        'items' => array(
-            array('LLL:EXT:cms/locallang_tca.xml:pages.no_search_checkbox_1_formlabel', 1),
-        )
-    )
-);
-
-// Register the noindex page property
-$TCA['pages']['columns']['tx_twsitemap_noindex'] = array(
-    'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:pages.tx_twsitemap_noindex',
-    'config' => Array(
-        'type' => 'check',
-        'items' => array(
-            array('LLL:EXT:cms/locallang_tca.xml:pages.no_search_checkbox_1_formlabel', 1),
-        )
-    )
-);
-
-$GLOBALS['TCA']['pages']['palettes']['searchengines'] = array(
-    'showitem' => 'tx_twsitemap_nofollow,tx_twsitemap_noindex',
-    'canNotCollapse' => true,
-);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
-    'pages',
-    '--palette--;LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:pages.palette.searchengines;searchengines',
-    '',
-    'before:module'
+        // Register the sitemap plugin
+        ExtensionUtility::registerPlugin(
+            'Tollwerk.TwSitemap',
+            'Sitemap',
+            'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:feplugin'
+        );
+    }
 );

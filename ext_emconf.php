@@ -11,39 +11,39 @@
  ***************************************************************/
 
 $EM_CONF[$_EXTKEY] = array(
-    'title' => 'tollwerk XML Sitemap',
-    'description' => 'Advanced Google XML Sitemap generation incl. various entry sources and multiple sitemap file support',
-    'category' => 'plugin',
-    'author' => 'Dipl.-Ing. Joschi Kuphal',
-    'author_email' => 'joschi@tollwerk.de',
-    'author_company' => 'tollwerk GmbH',
-    'dependencies' => 'cms,extbase,fluid',
-    'shy' => '',
-    'priority' => '',
-    'module' => '',
-    'state' => 'beta',
-    'internal' => '',
-    'uploadfolder' => 0,
-    'createDirs' => 'typo3temp/tw_sitemap',
-    'modify_tables' => '',
+    'title'            => 'tollwerk XML Sitemap',
+    'description'      => 'Advanced Google XML Sitemap generation incl. various entry sources and multiple sitemap file support',
+    'category'         => 'plugin',
+    'author'           => 'Dipl.-Ing. Joschi Kuphal',
+    'author_email'     => 'joschi@tollwerk.de',
+    'author_company'   => 'tollwerk GmbH',
+    'dependencies'     => 'cms,extbase,fluid',
+    'shy'              => '',
+    'priority'         => '',
+    'module'           => '',
+    'state'            => 'beta',
+    'internal'         => '',
+    'uploadfolder'     => 0,
+    'createDirs'       => 'typo3temp/tw_sitemap',
+    'modify_tables'    => '',
     'clearCacheOnLoad' => 0,
-    'lockType' => '',
-    'version' => '0.2.0',
-    'constraints' =>
+    'lockType'         => '',
+    'version'          => '0.2.0',
+    'constraints'      =>
         array(
-            'depends' =>
+            'depends'   =>
                 array(
-                    'extbase' => '6.0.0-0.0.0',
-                    'fluid' => '6.0.0-0.0.0',
-                    'php' => '5.3.0-0.0.0',
-                    'typo3' => '6.0.0-8.99.99',
+                    'extbase' => '9.5.0-',
+                    'fluid'   => '9.5.0-',
+                    'php'     => '7.0.0-',
+                    'typo3'   => '9.5.0-',
                 ),
             'conflicts' =>
                 array(),
-            'suggests' =>
+            'suggests'  =>
                 array(),
         ),
-    'suggests' =>
+    'suggests'         =>
         array(),
-    'conflicts' => '',
+    'conflicts'        => '',
 );

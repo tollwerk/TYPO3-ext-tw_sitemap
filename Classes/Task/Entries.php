@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Task;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,141 +26,169 @@ namespace Tollwerk\TwSitemap\Task;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Task;
+
+use Tollwerk\TwSitemap\Domain\Model\Entry;
+use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\BackendConfigurationManager;
+use TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface;
+use TYPO3\CMS\Scheduler\Controller\SchedulerModuleController;
+use TYPO3\CMS\Scheduler\Task\AbstractTask as Typo3AbstractTask;
+
 /**
- * Planer-Task zur Erzeugung von XML-Sitemap-Einträgen
+ * Scheduler task for creating XML sitemap entries
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CMS\Scheduler\AdditionalFieldProviderInterface
+class Entries extends AbstractTask implements AdditionalFieldProviderInterface
 {
     /**
-     * Basis-URL für Sitemap-Eintragsabfrage
+     * Root page
+     *
+     * @var int
+     */
+    protected $root;
+    /**
+     * Base URL for sitemap entry requests
      *
      * @var array
      */
-    protected $_baseUrl;
+    protected $baseUrl;
     /**
      * TypoScript service
      *
-     * @var unknown
+     * @var TypoScriptService
      */
-    protected $_typoscriptService = null;
+    protected $typoscriptService = null;
     /**
-     * Konfigurationstypen
+     * Configuration types
      *
      * @var array
      */
     protected static $_configTypes = array(
-        self::CONFIG_TYPE_FILE => '_generateFileEntries',
-        self::CONFIG_TYPE_PLUGIN => '_generatePluginEntries',
-        self::CONFIG_TYPE_TYPOSCRIPT => '_generateTyposcriptEntries',
+        self::CONFIG_TYPE_FILE       => 'generateFileEntries',
+        self::CONFIG_TYPE_PLUGIN     => 'generatePluginEntries',
+        self::CONFIG_TYPE_TYPOSCRIPT => 'generateTyposcriptEntries',
     );
     /**
-     * Aktueller Durchlaufszeitpunkt
+     * Current cycle timestamp
      *
      * @var int
      */
-    protected $_cycle = null;
+    protected $cycle = null;
     /**
      * Timeout for file requests
      *
      * @var int
      */
-    protected $_timeout = 600;
+    protected $timeout = 600;
     /**
      * Context for file requests
      *
      * @var resource
      */
-    protected $_httpContext = null;
+    protected $httpContext = null;
     /**
-     * Locale-Indices
+     * Locale locale indices
      *
-     * @var \array
+     * @var array
      */
-    protected $_localeIndices = array();
+    protected $localeIndices = array();
     /**
      * Enforce the HTTPS scheme on sitemap links
      *
      * @var bool
      */
-    protected $_enforceHttps = false;
+    protected $enforceHttps = false;
     /**
-     * Konfigurationstyp: Typoscript
+     * Debug mode
+     *
+     * @var bool
+     */
+    protected $debug = false;
+    /**
+     * Configuration type: Typoscript
      *
      * @var string
      */
     const CONFIG_TYPE_TYPOSCRIPT = 'typoscript';
     /**
-     * Konfigurationstyp: Datei
+     * Configuration type: File
      *
      * @var string
      */
     const CONFIG_TYPE_FILE = 'file';
     /**
-     * Konfigurationstyp: Plugin
+     * Configuration type: Plugin
      *
      * @var string
      */
     const CONFIG_TYPE_PLUGIN = 'plugin';
 
     /**
-     * Ausführen der Synchronisation
+     * Run the entry generation
      *
-     * @see tx_scheduler_Task::execute()
+     * @return bool Success
+     * @throws Exception
      */
-    public function execute()
+    public function execute(): bool
     {
-
-        // Ermitteln des TypoScript-Setups für Sitemap-Einträge
-        $_GET['id'] = intval($this->root);
-        $setup = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\BackendConfigurationManager')
-            ->getTypoScriptSetup();
-        $settings = $setup['plugin.']['tx_twsitemap.']['settings.'];
+        // Determine the TypoScript setup for sitemap entries
+        $_GET['id']   = intval($this->root);
+        $setup        = GeneralUtility::makeInstance(BackendConfigurationManager::class)->getTypoScriptSetup();
+        $settings     = $setup['plugin.']['tx_twsitemap.']['settings.'];
         $entriesSetup = $settings['entries.'];
 
-        // Prüfen, ob ein Sprachparameter gültig definiert ist
+        // Make sure there's a language parameter defined
         if (!array_key_exists('lang', $settings) || !strlen(trim($settings['lang']))) {
-            $this->addMessage('Invalid language parameter definition — please check your constant settings.',
-                \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
-            return true; // Must return TRUE for the moment due to https://forge.typo3.org/issues/70105
+            $this->addMessage(
+                'Invalid language parameter definition — please check your constant settings.',
+                FlashMessage::ERROR
+            );
+
             return false;
         }
 
-        // Prüfen, ob ein Basis-URL gültig definiert ist
+        // Make sure there's a base URL defined
         if (!array_key_exists('baseUrl', $settings) || !strlen(trim($settings['baseUrl']))) {
-            $this->addMessage('Invalid base URL definition — please check your constant settings.',
-                \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
-            return true; // Must return TRUE for the moment due to https://forge.typo3.org/issues/70105
+            $this->addMessage(
+                'Invalid base URL definition — please check your constant settings.',
+                FlashMessage::ERROR
+            );
+
             return false;
         }
 
         if (count($entriesSetup)) {
-            $this->_typoscriptService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
-            $this->_cycle = time();
-            $this->_enforceHttps = (boolean)$settings['https'];
-            $this->_httpContext = stream_context_create(array(
-                'http' => array(
-                    'timeout' => $this->_timeout
-                )
-            ));
+            $this->typoscriptService = GeneralUtility::makeInstance(TypoScriptService::class);
+            $this->cycle             = time();
+            $this->enforceHttps      = (boolean)$settings['https'];
+            $this->httpContext       = stream_context_create([
+                'http' => ['timeout' => $this->timeout],
+                'ssl'  => ['verify_peer' => false],
+            ]);
 
-            // Bestimmen des Basis-URL
-            $this->_baseUrl = (array)parse_url($settings['baseUrl']);
-            if (!array_key_exists('scheme', $this->_baseUrl)) {
-                $this->_baseUrl['scheme'] = 'http';
+            // Refine the base URL
+            $this->baseUrl = (array)parse_url($settings['baseUrl']);
+            if (!array_key_exists('scheme', $this->baseUrl)) {
+                $this->baseUrl['scheme'] = 'http';
             }
-            $this->_baseUrl['path'] = '/index.php';
-            parse_str(array_key_exists('query', $this->_baseUrl) ? $this->_baseUrl['query'] : '',
-                $this->_baseUrl['query']);
-            $this->_baseUrl['query']['no_cache'] = 1;
+            $this->baseUrl['path'] = '/index.php';
+            parse_str(array_key_exists('query', $this->baseUrl) ? $this->baseUrl['query'] : '',
+                $this->baseUrl['query']);
+            $this->baseUrl['query']['no_cache'] = 1;
 
-            // Durchlaufen aller Sitemap-Eintragsdefinitionen
+            // Run through all sitemap entry setups
             foreach ($entriesSetup as $key => $value) {
-                // Erzeugen von Einträgen anhand dieser Konfiguration
-                $this->_generateEntries(trim($key, '.'), $value, $setup['plugin.']['tx_twsitemap.']['settings.']);
+                $this->generateEntries(trim($key, '.'), $value, $setup['plugin.']['tx_twsitemap.']['settings.']);
             }
         }
 
@@ -170,394 +196,441 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
     }
 
     /**
-     * Spezifische Fehlerbehandlung beim fehlgeschlagenen Laden von XML-Daten
+     * Customized error handling for XML loading
      *
-     * @param int $errno Fehlernummer
-     * @param string $errstr Fehlerbeschreibung
-     * @param string $errfile Datei
-     * @param int $errline Fehlerzeile
-     * @return boolean                      FALSE, wenn mit der normalen Fehlerbehandlung fortgefahren werden soll
-     * @throws DOMException                 Wenn es sich um ein ungültiges Dokument handelt
+     * @param int $errno      Error number
+     * @param string $errstr  Error description
+     * @param string $errfile File
+     * @param int $errline    Line
+     *
+     * @return bool FALSE if regular handling should succeed
+     * @throws \DOMException If the XML document is invalid
      */
-    public function loadError($errno, $errstr, $errfile, $errline)
+    public function loadError(int $errno, string $errstr, string $errfile, int $errline)
     {
         if (($errno == E_WARNING) && ((substr_count($errstr, "\DOMDocument::loadXML()") > 0) || (substr_count($errstr,
                         "\DOMDocument::load()") > 0))
         ) {
-            throw new DOMException($errstr, DOM_VALIDATION_ERR);
+            throw new \DOMException($errstr, DOM_VALIDATION_ERR);
         } else {
             return false;
         }
     }
 
     /**
-     * Erzeugen von Einträgen gemäß einer Eintragsdefinition
+     * Creation of XML sitemap entries based on a configuration
      *
-     * @param string $key Konfigurationsschlüssel
-     * @param array $config Eintragsdefinition
-     * @param array $settings Einstellungen
-     * @return void
+     * @param string $key     Configuration key
+     * @param array $config   Configuration definition
+     * @param array $settings Settings
+     *
+     * @throws Exception
      */
-    protected function _generateEntries($key, array $config, array $settings)
+    protected function generateEntries(string $key, array $config, array $settings): void
     {
-
-        // Bestimmen der Rendering-Basisseite
+        // Find the rendering base page
         $pid = array_key_exists('pid', $config) ? intval($config['pid']) : 0;
 
-        // Bestimmen der Eintragsdomain
+        // Determine the entry domain
         $domain = array_key_exists('domain', $config) ? trim($config['domain']) : null;
 
-        // Abbruch bei fehlenden Parametern
+        // Stop in case of missing parameters
         if (($pid <= 0) || !strlen($domain)) {
             return;
         }
 
-        // Bestimmen des Sprachparameters sowie der zu durchlaufenden Sprachen
-        $langParam = trim($settings['lang']);
-        $languages = (array_key_exists('languages',
-                $config) && strlen(trim($config['languages']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',',
-            trim($config['languages'])) : array('');
-        $locales = array_pad((array_key_exists('locales',
-                $config) && strlen(trim($config['locales']))) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',',
-            trim($config['locales'])) : array(), count($languages), '');
-        $this->_localeIndices = array_flip($locales);
+        // Language setup
+        $langParam           = trim($settings['lang']);
+        $languages           = (array_key_exists('languages', $config) && strlen(trim($config['languages']))) ?
+            GeneralUtility::trimExplode(',', trim($config['languages'])) : [''];
+        $locales             = (array_key_exists('locales', $config) && strlen(trim($config['locales']))) ?
+            GeneralUtility::trimExplode(',', trim($config['locales'])) : [];
+        $locales             = array_pad($locales, count($languages), '');
+        $this->localeIndices = array_flip($locales);
 
-        // Bestimmen der Eintragsherkunft
+        // Origin setup
         $origin = array_key_exists('origin', $config) ? strval($config['origin']) : md5(serialize($config));
 
-        // Bestimmen der Änderungshäufigkeit
-        $changefreq = array_key_exists('changefreq',
-            $config) ? strtolower($config['changefreq']) : \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
-        if (!in_array($changefreq, \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs)) {
-            $changefreq = \Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs[\Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER];
+        // Change frequency setup
+        $changefreq = array_key_exists('changefreq', $config) ?
+            strtolower($config['changefreq']) : Entry::$changefreqs[Entry::CHANGEFREQ_NEVER];
+        if (!in_array($changefreq, Entry::$changefreqs)) {
+            $changefreq = Entry::$changefreqs[Entry::CHANGEFREQ_NEVER];
         }
 
-        // Bestimmen der Priorität
+        // Priority setup
         $priority = array_key_exists('priority', $config) ? floatval($config['priority']) : 0.5;
         $priority = max(0, min(1, $priority));
 
-        // Bestimmen der Eintragskonfiguration
+        // Entry setup
         $entryType = array_key_exists('entries', $config) ? strtolower($config['entries']) : null;
-        if (strlen($entryType) && array_key_exists($entryType, self::$_configTypes) && array_key_exists('entries.',
-                $config)
+        if (strlen($entryType)
+            && array_key_exists($entryType, self::$_configTypes)
+            && array_key_exists('entries.', $config)
         ) {
-            $baseUrl = $this->_baseUrl;
+            $baseUrl = $this->baseUrl;
 
             if (array_key_exists('baseUrl', $config)) {
                 if (is_string($config['baseUrl'])) {
-                    $baseUrl = \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($baseUrl,
-                        parse_url($config['baseUrl']));
+                    ArrayUtility::mergeRecursiveWithOverrule($baseUrl, parse_url($config['baseUrl']));
                 }
             } elseif (array_key_exists('baseUrl.', $config)) {
-                $baseUrl = \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($baseUrl,
-                    $this->_typoscriptService->convertTypoScriptArrayToPlainArray($config['baseUrl.']));
+                ArrayUtility::mergeRecursiveWithOverrule(
+                    $baseUrl,
+                    $this->typoscriptService->convertTypoScriptArrayToPlainArray($config['baseUrl.'])
+                );
             }
 
             $baseUrl['query']['id'] = $pid;
 
-            // Durchlaufen aller Sprachen
+            // Run through all languages
             foreach ($languages as $languageIndex => $language) {
                 if (strlen($language)) {
                     $baseUrl['query'][$langParam] = $language;
                 }
 
-                // Delegation an die jeweilige Generierungsmethode
-                call_user_func(array($this, self::$_configTypes[$entryType]), $key, $config['entries.'], $baseUrl,
-                    $domain, $origin, $changefreq, $priority, $locales[$languageIndex]);
+                // Delegate to entry generation method
+                call_user_func(
+                    [$this, self::$_configTypes[$entryType]],
+                    $key,
+                    $config['entries.'],
+                    $baseUrl,
+                    $domain,
+                    $origin,
+                    $changefreq,
+                    $priority,
+                    $locales[$languageIndex]
+                );
             }
         }
 
-        // Löschen aller Einträge der aktuellen Eintragsherkunft, die nicht im aktuellen Durchlauf angelegt oder aktualisiert wurden
-        $db = $GLOBALS['TYPO3_DB'];
-        $GLOBALS['TYPO3_DB']->sql_query('DELETE FROM `tx_twsitemap_domain_model_entry` WHERE `origin` = "'.$db->fullQuoteStr($origin,
-                'tx_twsitemap_domain_model_entry').'" AND `tstamp` < '.$this->_cycle);
+        // Delete old entries for the same origins which haven't been updated
+        $entryConnection = GeneralUtility::makeInstance(ConnectionPool::class)
+                                         ->getConnectionForTable('tx_twsitemap_domain_model_entry');
+        $entryQuery      = $entryConnection->createQueryBuilder();
+        $entryQuery->getRestrictions()->removeAll();
+        $entryQuery->delete('tx_twsitemap_domain_model_entry')
+                   ->where($entryQuery->expr()->eq('origin', $entryQuery->createNamedParameter($origin)))
+                   ->andWhere($entryQuery->expr()->lt('tstamp', $entryQuery->createNamedParameter($this->cycle)));
+        $entryQuery->execute();
     }
 
     /**
-     * Erzeugen von Sitemap-Einträgen anhand einer XML-Datei
+     * Creation of XML sitemap entries from an XML file
      *
-     * @param string $key Konfigurationsschlüssel
-     * @param array $config Typoscript-Konfiguration
-     * @param string $domain Sitemap-Domain
-     * @param array $baseUrl Anfrage-Basis-URL
-     * @param string $defaultOrigin Standard-Eintragsherkunft
-     * @param string $defaultChangefreq Standard-Änderungsfrequenz
-     * @param floatval $defaultPriority Standard-Priorität
-     * @param string $defaultLocale Standard-Locale
-     * @return void
+     * @param string $key               Configuration key
+     * @param array $config             TypoScript configuration
+     * @param array $baseUrl            Request base URL
+     * @param string $domain            Sitemap domain
+     * @param string $defaultOrigin     Default entry origin
+     * @param string $defaultChangefreq Default change frequency
+     * @param float $defaultPriority    Defailt priority
+     * @param string $defaultLocale     Default locale
+     *
+     * @throws Exception
      */
-    protected function _generateFileEntries(
-        $key,
+    protected function generateFileEntries(
+        string $key,
         array $config,
         array $baseUrl,
-        $domain,
-        $defaultOrigin,
-        $defaultChangefreq,
-        $defaultPriority,
-        $defaultLocale
-    ) {
+        string $domain,
+        string $defaultOrigin,
+        string $defaultChangefreq,
+        float $defaultPriority,
+        string $defaultLocale
+    ): void {
         if (array_key_exists('path', $config) && strlen(trim($config['path']))) {
             $path = PATH_site.trim($config['path']);
             if (@is_file($path) && @is_readable($path)) {
-                $this->_generateEntriesByXML(@file_get_contents($path, 0, $this->_httpContext), $domain, $defaultOrigin,
+                $this->generateEntriesByXML(file_get_contents($path, 0, $this->httpContext), $domain, $defaultOrigin,
                     $defaultChangefreq, $defaultPriority, $defaultLocale);
             }
         }
     }
 
     /**
-     * Erzeugen von Sitemap-Einträgen anhand eines Plugins
+     * Creation of XML sitemap entries from a plugin
      *
-     * @param string $key Konfigurationsschlüssel
-     * @param array $config Typoscript-Konfiguration
-     * @param string $domain Sitemap-Domain
-     * @param array $baseUrl Anfrage-Basis-URL
-     * @param string $defaultOrigin Standard-Eintragsherkunft
-     * @param string $defaultChangefreq Standard-Änderungsfrequenz
-     * @param floatval $defaultPriority Standard-Priorität
-     * @param string $defaultLocale Standard-Locale
-     * @return void
+     * @param string $key               Configuration key
+     * @param array $config             TypoScript configuration
+     * @param array $baseUrl            Request base URL
+     * @param string $domain            Sitemap domain
+     * @param string $defaultOrigin     Default entry origin
+     * @param string $defaultChangefreq Default change frequency
+     * @param float $defaultPriority    Defailt priority
+     * @param string $defaultLocale     Default locale
+     *
+     * @throws Exception
      */
-    protected function _generatePluginEntries(
-        $key,
+    protected function generatePluginEntries(
+        string $key,
         array $config,
         array $baseUrl,
-        $domain,
-        $defaultOrigin,
-        $defaultChangefreq,
-        $defaultPriority,
-        $defaultLocale
-    ) {
-        $url = $baseUrl;
-        $urlCredentials = empty($url['user']) ? '' : rawurlencode($url['user']).(empty($url['pass']) ? '' : ':'.rawurlencode($url['pass'])).'@';
-        $url['query']['type'] = 1213;
-        $url['query']['tx_twsitemap_sitemap'] = array('plugin' => $key);
-        $url = $url['scheme'].'://'.$urlCredentials.$url['host'].(array_key_exists('port',
-                $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
-
-        if ($this->debug) {
-            $this->addMessage(sprintf('Fetching URL: <a href="%s" target="_blank">%s</a>', $url, $url),
-                \TYPO3\CMS\Core\Messaging\FlashMessage::INFO);
-        }
-
-        $this->_generateEntriesByXML(strval(@file_get_contents($url, 0, $this->_httpContext)), $domain, $defaultOrigin,
-            $defaultChangefreq, $defaultPriority, $defaultLocale);
+        string $domain,
+        string $defaultOrigin,
+        string $defaultChangefreq,
+        float $defaultPriority,
+        string $defaultLocale
+    ): void {
+        $this->generateEntriesViaRequest(
+            self::CONFIG_TYPE_PLUGIN,
+            $key,
+            $baseUrl,
+            $domain,
+            $defaultOrigin,
+            $defaultChangefreq,
+            $defaultPriority,
+            $defaultLocale
+        );
     }
 
     /**
-     * Erzeugen von Sitemap-Einträgen anhand einer Typoscript-Konfiguration
+     * Creation of XML sitemap entries from a TypoScript configuration
      *
-     * @param string $key Konfigurationsschlüssel
-     * @param array $config Typoscript-Konfiguration
-     * @param string $domain Sitemap-Domain
-     * @param array $baseUrl Anfrage-Basis-URL
-     * @param string $defaultOrigin Standard-Eintragsherkunft
-     * @param string $defaultChangefreq Standard-Änderungsfrequenz
-     * @param floatval $defaultPriority Standard-Priorität
-     * @param string $defaultLocale Standard-Locale
-     * @return void
+     * @param string $key               Configuration key
+     * @param array $config             TypoScript configuration
+     * @param array $baseUrl            Request base URL
+     * @param string $domain            Sitemap domain
+     * @param string $defaultOrigin     Default entry origin
+     * @param string $defaultChangefreq Default change frequency
+     * @param float $defaultPriority    Defailt priority
+     * @param string $defaultLocale     Default locale
+     *
+     * @throws Exception
      */
-    protected function _generateTyposcriptEntries(
-        $key,
+    protected function generateTyposcriptEntries(
+        string $key,
         array $config,
         array $baseUrl,
-        $domain,
-        $defaultOrigin,
-        $defaultChangefreq,
-        $defaultPriority,
-        $defaultLocale
-    ) {
-        $url = $baseUrl;
-        $urlCredentials = empty($url['user']) ? '' : rawurlencode($url['user']).(empty($url['pass']) ? '' : ':'.rawurlencode($url['pass'])).'@';
-        $url['query']['type'] = 1212;
-        $url['query']['tx_twsitemap_sitemap'] = array('typoscript' => $key);
-        $url = $url['scheme'].'://'.$urlCredentials.$url['host'].(array_key_exists('port',
-                $url) ? ':'.$url['port'] : '').'/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
-
-        if ($this->debug) {
-            $this->addMessage(sprintf('Fetching URL: <a href="%s" target="_blank">%s</a>', $url, $url),
-                \TYPO3\CMS\Core\Messaging\FlashMessage::INFO);
-        }
-
-        $this->_generateEntriesByXML(strval(@file_get_contents($url, 0, $this->_httpContext)), $domain, $defaultOrigin,
-            $defaultChangefreq, $defaultPriority, $defaultLocale);
+        string $domain,
+        string $defaultOrigin,
+        string $defaultChangefreq,
+        float $defaultPriority,
+        string $defaultLocale
+    ): void {
+        $this->generateEntriesViaRequest(
+            self::CONFIG_TYPE_TYPOSCRIPT,
+            $key,
+            $baseUrl,
+            $domain,
+            $defaultOrigin,
+            $defaultChangefreq,
+            $defaultPriority,
+            $defaultLocale
+        );
     }
 
     /**
-     * Erzeugen von Sitemap-Einträgen aus XML-Quelltext
+     * Creation of XML sitemap entries via HTTP request
      *
+     * @param string $type              Request type
+     * @param string $key               Configuration key
+     * @param array $baseUrl            Request base URL
+     * @param string $domain            Sitemap domain
+     * @param string $defaultOrigin     Default entry origin
+     * @param string $defaultChangefreq Default change frequency
+     * @param float $defaultPriority    Defailt priority
+     * @param string $defaultLocale     Default locale
      *
-     *
-     * @param array $config Typoscript-Konfiguration
-     * @param string $domain Sitemap-Domain
-     * @param string $defaultOrigin Standard-Eintragsherkunft
-     * @param string $defaultChangefreq Standard-Änderungsfrequenz
-     * @param floatval $defaultPriority Standard-Priorität
-     * @param string $defaultLocale Standard-Locale
-     * @return void
+     * @throws Exception
      */
-    protected function _generateEntriesByXML(
-        $xml,
-        $domain,
-        $defaultOrigin,
-        $defaultChangefreq,
-        $defaultPriority,
-        $defaultLocale
-    ) {
+    protected function generateEntriesViaRequest(
+        string $type,
+        string $key,
+        array $baseUrl,
+        string $domain,
+        string $defaultOrigin,
+        string $defaultChangefreq,
+        float $defaultPriority,
+        string $defaultLocale
+    ): void {
+        $url                                  = $baseUrl;
+        $urlCredentials                       = empty($url['user']) ?
+            '' : rawurlencode($url['user']).(empty($url['pass']) ? '' : ':'.rawurlencode($url['pass'])).'@';
+        $url['query']['type']                 = 1212;
+        $url['query']['tx_twsitemap_sitemap'] = array($type => $key);
+        $url                                  = $url['scheme'].'://'.$urlCredentials.$url['host'].
+                                                (array_key_exists('port', $url) ? ':'.$url['port'] : '').
+                                                '/'.ltrim($url['path'], '/').'?'.http_build_query($url['query']);
+
+        if ($this->debug) {
+            $this->addMessage(sprintf('Fetching URL: %s', $url), FlashMessage::INFO);
+        }
+
+        $this->generateEntriesByXML(
+            strval(file_get_contents($url, 0, $this->httpContext)),
+            $domain,
+            $defaultOrigin,
+            $defaultChangefreq,
+            $defaultPriority,
+            $defaultLocale
+        );
+    }
+
+    /**
+     * Creation of sitemap entries from XML source
+     *
+     * @param string $xml               XML
+     * @param string $domain            Sitemap domain
+     * @param string $defaultOrigin     Default entry origin
+     * @param string $defaultChangefreq Default change frequency
+     * @param float $defaultPriority    Defailt priority
+     * @param string $defaultLocale     Default locale
+     *
+     * @throws Exception
+     */
+    protected function generateEntriesByXML(
+        string $xml,
+        string $domain,
+        string $defaultOrigin,
+        string $defaultChangefreq,
+        float $defaultPriority,
+        string $defaultLocale
+    ): void {
         $xml = '<entries>'.preg_replace("%^\<\?[^\<]*?%", '', trim($xml)).'</entries>';
 
-        // Instanziieren als DOM-Objekt
+        // Instantiate as DOM document
         set_error_handler(array($this, 'loadError'));
         try {
-            $entries = new \DOMDocument();
-            $entries->formatOutput = true;
+            $entries                     = new \DOMDocument();
+            $entries->formatOutput       = true;
             $entries->preserveWhiteSpace = true;
             $entries->loadXML($xml, LIBXML_NSCLEAN);
-            // Wenn ein Fehler auftritt
-        } catch (DOMException $e) {
+        } catch (\DOMException $e) {
             trigger_error($e->getCode());
             restore_error_handler();
+
             return;
         }
         restore_error_handler();
 
-        // Gründen eines XPath-Prozessors
+        // Create XPath operator
         $xpath = new \DOMXPath($entries);
 
-        // Vorbereiten der Änderungsfrequenzen
-        $changefreqs = array_flip(\Tollwerk\TwSitemap\Domain\Model\Entry::$changefreqs);
+        // Prepare change frequencies
+        $changefreqs = array_flip(Entry::$changefreqs);
 
-        // Durchlaufen aller enthaltenen A-Elemente
-        /* @var $entry DOMElement */
+        // Run through all <a> elements
+        /* @var $entry \DOMElement */
         foreach ($xpath->query('//a[@href]') as $entryIndex => $entry) {
 
-            // Extrahieren & Normalisieren des Eintrags-URL
-            $loc = trim($entry->getAttribute('href'));
+            // Extract & normalize entry URL
+            $loc      = trim($entry->getAttribute('href'));
             $locParts = parse_url($loc);
-            $loc = empty($locParts['port']) ? '' : ':'.$locParts['port'];
-            $loc .= empty($locParts['path']) ? '/' : $locParts['path'];
-            $loc .= empty($locParts['query']) ? '' : '?'.$locParts['query'];
-            $loc .= empty($locParts['fragment']) ? '' : '#'.$locParts['fragment'];
+            $loc      = empty($locParts['port']) ? '' : ':'.$locParts['port'];
+            $loc      .= empty($locParts['path']) ? '/' : $locParts['path'];
+            $loc      .= empty($locParts['query']) ? '' : '?'.$locParts['query'];
+            $loc      .= empty($locParts['fragment']) ? '' : '#'.$locParts['fragment'];
 
-            // Extrahieren der übrigen Parameter
-            $origin = trim($entry->getAttribute('data-origin'));
-            $origin = strlen($origin) ? $origin : $defaultOrigin;
-            $source = trim($entry->getAttribute('data-source'));
-            $source = strlen($source) ? $source : $entryIndex;
-            $lastmod = trim($entry->getAttribute('data-lastmod'));
-            $lastmod = strlen($lastmod) ? intval($lastmod) : time();
+            // Extract other parameters
+            $origin     = trim($entry->getAttribute('data-origin'));
+            $origin     = strlen($origin) ? $origin : $defaultOrigin;
+            $source     = trim($entry->getAttribute('data-source'));
+            $source     = strlen($source) ? $source : $entryIndex;
+            $lastmod    = trim($entry->getAttribute('data-lastmod'));
+            $lastmod    = strlen($lastmod) ? intval($lastmod) : time();
             $changefreq = trim($entry->getAttribute('data-changefreq'));
             $changefreq = strtolower(strlen($changefreq) ? $changefreq : trim($defaultChangefreq));
             $changefreq = (strlen($changefreq) && array_key_exists($changefreq,
-                    $changefreqs)) ? $changefreqs[$changefreq] : \Tollwerk\TwSitemap\Domain\Model\Entry::CHANGEFREQ_NEVER;
-            $priority = trim($entry->getAttribute('data-priority'));
-            $priority = strlen($priority) ? floatval($priority) : $defaultPriority;
-            $locale = trim($entry->getAttribute('data-locale'));
-            $locale = strlen($locale) ? strval($locale) : $defaultLocale;
+                    $changefreqs)) ? $changefreqs[$changefreq] : Entry::CHANGEFREQ_NEVER;
+            $priority   = trim($entry->getAttribute('data-priority'));
+            $priority   = strlen($priority) ? floatval($priority) : $defaultPriority;
+            $locale     = trim($entry->getAttribute('data-locale'));
+            $locale     = strlen($locale) ? strval($locale) : $defaultLocale;
 
-            // Vorbereiten des Eintragsdatensatzes
+            // Prepare entry record
             $entry = array(
-                'domain' => $domain,
-                'origin' => $origin,
-                'source' => $source,
-                'loc' => $loc,
+                'domain'     => $domain,
+                'origin'     => $origin,
+                'source'     => $source,
+                'loc'        => $loc,
                 'changefreq' => $changefreq,
-                'priority' => $priority,
-                'language' => $locale,
-                'position' => $this->_localeIndices[$defaultLocale],
-                'lastmod' => $lastmod,
-                'tstamp' => $this->_cycle,
-                'deleted' => 0
+                'priority'   => $priority,
+                'language'   => $locale,
+                'position'   => $this->localeIndices[$defaultLocale],
+                'lastmod'    => $lastmod,
+                'tstamp'     => $this->cycle,
+                'deleted'    => 0
             );
 
-            // Datenbank-Eintrag
-            $data = $GLOBALS['TYPO3_DB']->fullQuoteArray($entry, 'tx_twsitemap_domain_model_entry');
-            $GLOBALS['TYPO3_DB']->sql_query('REPLACE INTO `tx_twsitemap_domain_model_entry` (`'.implode('`, `',
-                    array_keys($entry)).'`) VALUES ('.implode(', ', $data).')');
+            // Insert or update the entry
+            $entryConnection = GeneralUtility::makeInstance(ConnectionPool::class)
+                                             ->getConnectionForTable('tx_twsitemap_domain_model_entry');
+            $entryQuery      = $entryConnection->createQueryBuilder();
+            $entryQuery->getRestrictions()->removeAll();
+            $entryQuery->select('uid')->from('tx_twsitemap_domain_model_entry')
+                       ->where($entryQuery->expr()->eq('language', $entryQuery->createNamedParameter($locale)))
+                       ->andWhere($entryQuery->expr()->eq('origin', $entryQuery->createNamedParameter($origin)))
+                       ->andWhere($entryQuery->expr()->eq('domain', $entryQuery->createNamedParameter($domain)))
+                       ->andWhere($entryQuery->expr()->eq('source', $entryQuery->createNamedParameter($source)));
+            $entryResult = $entryQuery->execute();
+            $entryQuery  = $entryConnection->createQueryBuilder();
+            $entryQuery->getRestrictions()->removeAll();
+            if ($entryResult->rowCount()) {
+                $entryUid = $entryResult->fetchColumn();
+                $entryQuery->update('tx_twsitemap_domain_model_entry')
+                           ->where($entryQuery->expr()->eq('uid', $entryQuery->createNamedParameter($entryUid)));
+                foreach ($entry as $key => $value) {
+                    $entryQuery->set($key, $value);
+                }
+            } else {
+                $entryQuery->insert('tx_twsitemap_domain_model_entry')->values($entry);
+            }
+            $entryQuery->execute();
         }
-    }
-
-    /**
-     * Absetzen eines HTTP-Aufrufs per CURL
-     *
-     * @param string $url Endpunkt / URL
-     * @param array $header Header
-     * @param string $method Methode
-     * @param string $body Body
-     * @param boolean $debug Debugging-Ausgaben
-     * @return string                    Daten
-     * @deprecated
-     */
-    public static function httpRequest($url, array $header, $method, $body = null, $debug = false)
-    {
-        if (!$method) {
-            $method = 'GET';
-        };
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_HEADER, 0);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
-        curl_setopt($curl, CURLOPT_TIMEOUT, 600);
-
-        if ($body) {
-            curl_setopt($curl, CURLOPT_POST, 1);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $body);
-            curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array_merge($header, 'Content-Type: text/xml;charset=utf-8'));
-        }
-
-        $data = curl_exec($curl);
-
-        // Ggf. Debugging-Ausgabe
-        if ($debug) {
-            print_r(curl_getinfo($curl));
-        }
-
-        curl_close($curl);
-
-        return $data;
     }
 
     /**
      * Return the additional fields
      *
-     * @param \array $taskInfo
-     * @param unknown $task
-     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject
-     * @return multitype:multitype:string
+     * @param array $taskInfo Task info
+     * @param $task
+     * @param SchedulerModuleController $parentObject
+     *
+     * @return array Return additional fields
      */
-    public function getAdditionalFields(
-        array &$taskInfo,
-        $task,
-        \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject
-    ) {
-        $additionalFields = array();
+    public function getAdditionalFields(array &$taskInfo, $task, SchedulerModuleController $parentObject): array
+    {
+        $additionalFields = [];
 
         // Root page
         $fieldName = 'tx_scheduler[tw_sitemap_root]';
-        $fieldId = 'task_sitemap_root';
-        $fieldHTML = '<input type="text" size="3" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->root) ? 1 : $task->root).'"/>';
-        $additionalFields[$fieldId] = array(
-            'code' => $fieldHTML,
-            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.root',
-            'cshKey' => '_MOD_system_txschedulerM1',
+        $fieldId   = 'task_sitemap_root';
+        $fieldHTML = '<select name="'.$fieldName.'" id="'.$fieldId.'">';
+
+        // Collect root pages
+        $pageConnection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable('pages');
+        $pageQuery      = $pageConnection->createQueryBuilder();
+        $pageQuery->getRestrictions()->removeAll();
+        $pageQuery->select('*')->from('pages')
+                  ->where($pageQuery->expr()->eq('is_siteroot', $pageQuery->createNamedParameter(1)));
+        $pageResult = $pageQuery->execute();
+        if ($pageResult) {
+            while ($page = $pageResult->fetch()) {
+                $fieldHTML .= '<option value="'.$page['uid'].'"'.
+                              (($page['uid'] == $task->root) ? ' selected="selected"' : '').
+                              '>'.htmlspecialchars($page['title']).' ('.$page['uid'].')</option>';
+            }
+        }
+
+        $fieldHTML                  .= '</select>';
+        $additionalFields[$fieldId] = [
+            'code'     => $fieldHTML,
+            'label'    => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.root',
+            'cshKey'   => '_MOD_system_txschedulerM1',
             'cshLabel' => $fieldId
-        );
+        ];
 
         // Debug output
-        $fieldName = 'tx_scheduler[tw_sitemap_debug]';
-        $fieldId = 'task_sitemap_debug';
-        $fieldHTML = '<input type="checkbox" value="1" name="'.$fieldName.'" id="'.$fieldId.'"'.((empty($task->debug) || !$task->debug) ? '' : ' checked="checked"').'"/>';
-        $additionalFields[$fieldId] = array(
-            'code' => $fieldHTML,
-            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.debug',
-            'cshKey' => '_MOD_system_txschedulerM1',
+        $fieldName                  = 'tx_scheduler[tw_sitemap_debug]';
+        $fieldId                    = 'task_sitemap_debug';
+        $fieldHTML                  = '<input type="checkbox" value="1" name="'.$fieldName.'" id="'.$fieldId.'"'.((empty($task->debug) || !$task->debug) ? '' : ' checked="checked"').'"/>';
+        $additionalFields[$fieldId] = [
+            'code'     => $fieldHTML,
+            'label'    => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.debug',
+            'cshKey'   => '_MOD_system_txschedulerM1',
             'cshLabel' => $fieldId
-        );
+        ];
 
         return $additionalFields;
     }
@@ -565,27 +638,22 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
     /**
      * Validate the additional fields
      *
-     * @param \array $submittedData Submitted data
-     * @param \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject Parent controller object
-     * @return \boolean                                                                    Field validity
+     * @param array $submittedData                    Submitted data
+     * @param SchedulerModuleController $parentObject Parent controller object
+     *
+     * @return bool Field validity
      */
-    public function validateAdditionalFields(
-        array &$submittedData,
-        \TYPO3\CMS\Scheduler\Controller\SchedulerModuleController $parentObject
-    ) {
+    public function validateAdditionalFields(array &$submittedData, SchedulerModuleController $parentObject): bool
+    {
         $valid = true;
 
         $submittedData['tw_sitemap_root'] = trim($submittedData['tw_sitemap_root']);
         if (!intval($submittedData['tw_sitemap_root'])) {
-            $parentObject->addMessage('The root page ID must be a valid integer',
-                \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+            $parentObject->addMessage('The root page ID must be a valid integer', FlashMessage::ERROR);
             $valid = false;
         } else {
-            $rootPage = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('uid', 'pages',
-                'deleted=0 AND hidden=0 AND uid='.intval($submittedData['tw_sitemap_root']));
-            if (empty($rootPage)) {
-                $parentObject->addMessage('The root page ID must refer to a valid page',
-                    \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+            if (empty(BackendUtility::getRecord('pages', intval($submittedData['tw_sitemap_root'])))) {
+                $parentObject->addMessage('The root page ID must refer to a valid page', FlashMessage::ERROR);
                 $valid = false;
             }
         }
@@ -596,12 +664,12 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
     /**
      * Save the additional field values
      *
-     * @param \array $submittedData Submitted fields
-     * @param \TYPO3\CMS\Scheduler\Task\AbstractTask $task Task instance
+     * @param array $submittedData    Submitted fields
+     * @param Typo3AbstractTask $task Task instance
      */
-    public function saveAdditionalFields(array $submittedData, \TYPO3\CMS\Scheduler\Task\AbstractTask $task)
+    public function saveAdditionalFields(array $submittedData, Typo3AbstractTask $task)
     {
-        $task->root = intval(trim($submittedData['tw_sitemap_root']));
+        $task->root  = intval(trim($submittedData['tw_sitemap_root']));
         $task->debug = intval(trim($submittedData['tw_sitemap_debug']));
     }
 
@@ -613,8 +681,8 @@ class Entries extends \Tollwerk\TwSitemap\Task\AbstractTask implements \TYPO3\CM
     public function getAdditionalInformation()
     {
         $root = intval($this->root);
-        $root = $root ? \TYPO3\CMS\Backend\Utility\BackendUtility::getRecordRaw('pages', 'uid='.$root) : null;
-        return $root ? 'Root page: '.\TYPO3\CMS\Backend\Utility\BackendUtility::getRecordTitle('pages',
-                $root).' ('.$this->root.')' : '';
+        $root = $root ? BackendUtility::getRecord('pages', $root) : null;
+
+        return $root ? 'Root page: '.BackendUtility::getRecordTitle('pages', $root).' ('.$this->root.')' : '';
     }
 }

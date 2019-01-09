@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Domain\Repository;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,52 +26,61 @@ namespace Tollwerk\TwSitemap\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Domain\Repository;
+
+use Tollwerk\TwSitemap\Domain\Model\Entry;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
+use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+
 /**
- * Respository für XML-Sitemap-Einträge
+ * XML sitemap entry repository
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
     /**
-     * Standardsortierung
+     * Default ordering
      *
      * @var array
      */
     protected $defaultOrderings = array(
         'priority' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING,
-        'loc' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_ASCENDING
+        'loc'      => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_ASCENDING
     );
 
     /**
-     * Hinzufügen von Objekten aus einem Array
+     * Add objects from an array
      *
-     * @param array $objectArray Objekt-Array
-     * @return void
+     * @param array $objectArray Object array
+     *
+     * @throws IllegalObjectTypeException
      */
-    public function addObjectsFromArray(array $objectArray)
+    public function addObjectsFromArray(array $objectArray): void
     {
-        // Durchlaufen aller übergebenen Objekte
+        // Run through all objects
         foreach ($objectArray as $objectData) {
             $object = new $this->objectType();
             $object->setFromArray($objectData);
             $this->add($object);
         }
 
-        $persistenceManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance("TYPO3\\CMS\\Extbase\\Persistence\\Generic\\PersistenceManager");
+        $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
         $persistenceManager->persistAll();
     }
 
     /**
-     * Ermitteln eines Eintrags zu einer Domain und einem URL
+     * Find an entry for a domain and URL
      *
      * @param string $domain Domain
-     * @param string $loc URL
-     * @return \Tollwerk\TwSitemap\Domain\Model\Entry        Sitemap-Eintrag
+     * @param string $loc    URL
+     *
+     * @return Entry        Sitemap-Eintrag
      */
-    public function findOneByDomainLoc($domain, $loc)
+    public function findOneByDomainLoc($domain, $loc): ?Entry
     {
         $query = $this->createQuery();
         $query->matching($query->logicalAnd(array(
@@ -81,6 +88,7 @@ class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $query->equals('loc', $loc),
         )));
         $result = $query->execute();
+
         return count($result) ? $result->getFirst() : null;
     }
 }

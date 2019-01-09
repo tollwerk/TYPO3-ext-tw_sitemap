@@ -15,7 +15,7 @@
     }
   ],
   "require": {
-    "typo3/cms": "*"
+    "typo3/cms-core": "*"
   },
   "extra": {
     "typo3/cms": {

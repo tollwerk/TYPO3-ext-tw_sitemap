@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Domain\Model;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,14 +26,18 @@ namespace Tollwerk\TwSitemap\Domain\Model;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Domain\Model;
+
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 /**
- * Modellklasse für XML-Sitemaps
+ * XML Sitemap
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Sitemap extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Sitemap extends AbstractEntity
 {
     /**
      * Domain
@@ -69,88 +71,108 @@ class Sitemap extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
     protected $filename;
 
     /**
-     * GZIP-Kompression
+     * GZIP compression
      *
      * @var boolean
      */
     protected $gz;
 
     /**
-     * @return the $gz
+     * Returns the use of GZIP
+     *
+     * @return bool GZIP
      */
-    public function getGz()
+    public function getGz(): bool
     {
         return $this->gz;
     }
 
     /**
-     * @param boolean $gz
+     * Set the use of GZIP
+     *
+     * @param bool $gz
      */
-    public function setGz($gz)
+    public function setGz(bool $gz): void
     {
         $this->gz = $gz;
     }
 
     /**
-     * @return the $domain
+     * Returns the domain
+     *
+     * @return string Domain
      */
-    public function getDomain()
+    public function getDomain(): string
     {
         return $this->domain;
     }
 
     /**
-     * @return the $scheme
+     * Returns the scheme
+     *
+     * @return string Scheme
      */
-    public function getScheme()
+    public function getScheme(): string
     {
         return $this->scheme;
     }
 
     /**
-     * @return the $filename
+     * Returns the filename
+     *
+     * @return string Filename
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
     /**
-     * @param string $domain
+     * Sets the domain
+     *
+     * @param string $domain Domain
      */
-    public function setDomain($domain)
+    public function setDomain(string $domain): void
     {
         $this->domain = $domain;
     }
 
     /**
-     * @param string $scheme
+     * Sets the scheme
+     *
+     * @param string $scheme Scheme
      */
-    public function setScheme($scheme)
+    public function setScheme(string $scheme): void
     {
         $this->scheme = $scheme;
     }
 
     /**
-     * @param string $filename
+     * Sets the filename
+     *
+     * @param string $filename Filename
      */
-    public function setFilename($filename)
+    public function setFilename(string $filename): void
     {
         $this->filename = $filename;
     }
 
     /**
-     * @return the $targetDomain
+     * Returns the target domain
+     *
+     * @return string Target domain
      */
-    public function getTargetDomain()
+    public function getTargetDomain(): string
     {
         return $this->targetDomain;
     }
 
     /**
-     * @param string $targetDomain
+     * Sets the target domain
+     *
+     * @param string $targetDomain Target domain
      */
-    public function setTargetDomain($targetDomain)
+    public function setTargetDomain(string $targetDomain): void
     {
         $this->targetDomain = $targetDomain;
     }

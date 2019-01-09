@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Controller;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,77 +26,85 @@ namespace Tollwerk\TwSitemap\Controller;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Controller;
+
+use Tollwerk\TwSitemap\Domain\Model\Sitemap;
+use Tollwerk\TwSitemap\Domain\Repository\SitemapRepository;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
+use TYPO3\CMS\Extbase\Persistence\Repository;
+use TYPO3\CMS\Frontend\ContentObject\Exception\ContentRenderingException;
+
 /**
- * Sitemap-Plugin-Controller
+ * Sitemap plugin controller
  *
  * @package tw_sitemap
  * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+class SitemapController extends ActionController
 {
     /**
-     * Sitemap-Eintrags-Repository
+     * Sitemap entry repository
      *
-     * @var \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository
+     * @var SitemapRepository
      */
     protected $sitemapRepository;
     /**
-     * Eintragskonfigurationen
+     * Entry configuration
      *
      * @var array
      */
-    protected $_entriesConfiguration = array();
+    protected $entriesConfiguration = [];
     /**
-     * Plugin-Parameter-Callbacks
+     * Plugin parameter callbacs
      *
      * @var array
      */
     protected static $_pluginParameterTypeCallbacks = array(
-        'repository' => '_getParameterValuesRepository',
+        'repository' => 'getParameterValuesRepository',
     );
 
     /**
-     * Dependecy-Injection des Sitemap-Repositories
+     * Inject the sitemap repositors
      *
-     * @param \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository $sitemapRepository Sitemap-Repository
+     * @param SitemapRepository $sitemapRepository Sitemap repository
      *
      * @return void
      */
-    public function injectSitemapRepository(\Tollwerk\TwSitemap\Domain\Repository\SitemapRepository $sitemapRepository)
+    public function injectSitemapRepository(SitemapRepository $sitemapRepository): void
     {
         $this->sitemapRepository = $sitemapRepository;
     }
 
     /**
-     * Anzeigen einer XML-Sitemap
+     * Render an XML sitemap
      *
-     * Diese Aktion wird ohne Parameter aufgerufen. Es wird der Settings-Parameter "domain" ermittelt,
-     * der für die aktuelle Frontend-Seite per TypoScript konfiguriert ist. Sofern für diese Domain eine
-     * XML-Sitemap angelegt ist, wird diese ausgeliefert. Es wird automatisch berücksichtigt, ob für die
-     * Sitemap Gzip-Kompression aktiviert ist.
-     *
-     * @return string                        XML-Sitemap
-     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnsupportedMethodException
+     * The method is called without parameters and will automatically detect the most suitable XML sitemap
+     * (with or without GZIP compression).
      */
-    public function indexAction()
+    public function indexAction(): void
     {
-        $sitemap = $this->sitemapRepository->findOneByTargetDomain($_SERVER['HTTP_HOST']);
-        if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
-            $sitemap = $this->sitemapRepository->findOneByDomain($_SERVER['HTTP_HOST']);
-            if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
+        $serverParams = $GLOBALS['TYPO3_REQUEST']->getServerParams();
+        $httpHost     = $serverParams['HTTP_HOST'];
+        $sitemap      = $this->sitemapRepository->findOneByTargetDomain($httpHost);
+        if (!($sitemap instanceof Sitemap)) {
+            $sitemap = $this->sitemapRepository->findOneByDomain($httpHost);
+            if (!($sitemap instanceof Sitemap)) {
                 $domain = $this->settings['domain'];
                 if (strlen($domain)) {
                     $sitemap = $this->sitemapRepository->findOneByTargetDomain($domain);
-                    if (!($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap)) {
+                    if (!($sitemap instanceof Sitemap)) {
                         $sitemap = $this->sitemapRepository->findOneByDomain($domain);
                     }
                 }
             }
         }
 
-        // Wenn ein geeigneter Sitemap-Eintrag gefunden wurde ...
-        if ($sitemap instanceof \Tollwerk\TwSitemap\Domain\Model\Sitemap) {
+        // If a matching sitemap entry was found
+        if ($sitemap instanceof Sitemap) {
             $sitemapDirectory = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
 
             if (@is_dir($sitemapDirectory)) {
@@ -117,57 +123,54 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
-     * Rendern von Sitemap-Einträgen anhand einer TypoScript-Konfiguration
+     * Rendering of sitemap entries based on a TypoScript configuration
      *
-     * @param string $typoscript Schlüssel der zu rendernden Typoscript-Konfiguration
+     * @param string $typoscript TypoScript key
      *
-     * @return void
+     * @throws ContentRenderingException
      */
-    public function typoscriptAction($typoscript = null)
+    public function typoscriptAction($typoscript = null): void
     {
         header('Content-Type: text/xml; charset=utf-8');
 
-        /*Tx_Extbase_Utility_TypoScript*/
-        $typoscriptService           = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
-        $this->_entriesConfiguration = array_key_exists('entries',
-            $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-        $typoscript                  = strval($typoscript);
-        $tsConfig                    = (strlen($typoscript) && array_key_exists("$typoscript.",
-                $this->_entriesConfiguration) && array_key_exists('entries.',
-                $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
-        $tsResult                    = is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->getContentObject('COA')
-                                                                                   ->render($tsConfig) : '';
+        $typoscriptService          = GeneralUtility::makeInstance(TypoScriptService::class);
+        $this->entriesConfiguration = array_key_exists('entries', $this->settings) ?
+            $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : [];
+        $typoscript                 = strval($typoscript);
+        $tsConfig                   = (
+            strlen($typoscript) && array_key_exists("$typoscript.", $this->entriesConfiguration)
+            && array_key_exists('entries.', $this->entriesConfiguration["$typoscript."])) ?
+            $this->entriesConfiguration["$typoscript."]['entries.'] : null;
+        $tsResult                   = is_array($tsConfig) ?
+            $GLOBALS['TSFE']->cObj->getContentObject('COA')->render($tsConfig) : '';
         die("<entries>$tsResult</entries>");
-        exit;
     }
 
     /**
-     * Rendern von Sitemap-Einträgen anhand einer Plugin-Konfiguration
+     * Rendering of sitemap entries based on a plugin configuration
      *
-     * @param string $plugin Schlüssel der zu rendernden Plugin-Konfiguration
-     *
-     * @return void
+     * @param string $plugin Plugin configuration key
      */
-    public function pluginAction($plugin = null)
+    public function pluginAction($plugin = null): void
     {
         header('Content-Type: text/xml; charset=utf-8');
 
-        $typoscriptService           = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
-        $this->_entriesConfiguration = array_key_exists('entries',
-            $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-        $plugin                      = strval($plugin);
-        $pluginConfig                = (strlen($plugin) && array_key_exists("$plugin.",
-                $this->_entriesConfiguration) && array_key_exists('entries.',
-                $this->_entriesConfiguration["$plugin."])) ? $this->_entriesConfiguration["$plugin."]['entries.'] : null;
+        $typoscriptService          = GeneralUtility::makeInstance(TypoScriptService::class);
+        $this->entriesConfiguration = array_key_exists('entries', $this->settings) ?
+            $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : [];
+        $plugin                     = strval($plugin);
+        $pluginConfig               = (strlen($plugin) && array_key_exists("$plugin.",
+                $this->entriesConfiguration) && array_key_exists('entries.',
+                $this->entriesConfiguration["$plugin."])) ? $this->entriesConfiguration["$plugin."]['entries.'] : null;
 
-        // Ermitteln des Parameter-Basisnamens
+        // Determine the parameter basename
         $extensionName = array_key_exists('extension', $pluginConfig) ? trim($pluginConfig['extension']) : null;
         $pluginName    = array_key_exists('plugin', $pluginConfig) ? trim($pluginConfig['plugin']) : null;
         $controller    = array_key_exists('controller', $pluginConfig) ? trim($pluginConfig['controller']) : null;
         $action        = array_key_exists('action', $pluginConfig) ? trim($pluginConfig['action']) : null;
-        $parameter     = array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : array();
+        $parameter     = array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : [];
 
-        // Wenn der Parameterbasisname definiert werden kann und ein alternierender Parameter definiert ist
+        // If the parameter basename is defined and there's an alternating parameter
         if (strlen($extensionName) && strlen($pluginName) && strlen($controller) && strlen($action) && count($parameter)) {
             $this->view->assign('extensionName', $extensionName);
             $this->view->assign('pluginName', $pluginName);
@@ -175,20 +178,21 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
             $this->view->assign('action', $action);
             $this->view->assign('pageUid', $GLOBALS['TSFE']->id);
 
-            // Definieren des Parameterbasisnamens, -namens und -typs
-            $parameters = array();
-// 			$parameterBase = strtolower('tx_'.strtr($pluginName, '_', '').'_'.strtr($controller, '_', ''));
+            // Define the parameter name and type
+            $parameters    = [];
             $parameterName = array_key_exists('name', $parameter) ? trim($parameter['name']) : null;
             $parameterType = array_key_exists('type', $parameter) ? trim($parameter['type']) : null;
 
-            // Wenn ein sinnvoller Parameter definiert ist ...
-            if (strlen($parameterName) && strlen($parameterType) && array_key_exists($parameterType,
-                    self::$_pluginParameterTypeCallbacks)
+            // If there are reasonable values
+            if (strlen($parameterName)
+                && strlen($parameterType)
+                && array_key_exists($parameterType, self::$_pluginParameterTypeCallbacks)
             ) {
-                $parameters[$parameterName] = call_user_func(array(
-                    $this,
-                    self::$_pluginParameterTypeCallbacks[$parameterType]
-                ), $parameter, $this->_entriesConfiguration["$plugin."]);
+                $parameters[$parameterName] = call_user_func(
+                    [$this, self::$_pluginParameterTypeCallbacks[$parameterType]],
+                    $parameter,
+                    $this->entriesConfiguration["$plugin."]
+                );
                 $this->view->assign('parameters', $parameters);
                 die($this->view->render());
 
@@ -202,40 +206,40 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     }
 
     /**
-     * Erzeugen von repositorybezogenen Parameterwerten
+     * Creation of repository related parameter values
      *
-     * @param array $config       Parameterkonfiguration
-     * @param array $pluginConfig Globale Konfiguration
+     * @param array $config       Parameter configuration
+     * @param array $pluginConfig Global configuration
      *
-     * @return array                    Parameterwerte
+     * @return array Parameter values
      */
-    protected function _getParameterValuesRepository($config, $pluginConfig)
+    protected function getParameterValuesRepository($config, $pluginConfig): array
     {
-        $values        = array();
-        $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+        $values        = [];
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
         $repository    = $objectManager->get($config['repository']);
-        if ($repository instanceof \TYPO3\CMS\Extbase\Persistence\Repository) {
-            $repositoryConfig = array_key_exists('repository.', $config) ? (array)$config['repository.'] : array();
+        if ($repository instanceof Repository) {
+            $repositoryConfig = array_key_exists('repository.', $config) ? (array)$config['repository.'] : [];
 
-            // Ermitten von zulässigen Storage-PIDs
-            $storagePids = array_key_exists('storagePid',
-                $repositoryConfig) ? (strlen(trim($repositoryConfig['storagePid'])) ? \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',',
-                trim($repositoryConfig['storagePid'])) : array()) : array($GLOBALS['TSFE']->id);
+            // Determine valid storage PIDs
+            $storagePids = array_key_exists('storagePid', $repositoryConfig) ?
+                (strlen(trim($repositoryConfig['storagePid'])) ? GeneralUtility::trimExplode(',',
+                    trim($repositoryConfig['storagePid'])) : []) : array($GLOBALS['TSFE']->id);
 
-            // Erzeugen einer Abfrage
+            // Create a query
             $query = $repository->createQuery();
             $query->getQuerySettings()->setStoragePageIds($storagePids);
 
             // TODO: WHERE clauses etc.
 
-            // Ausführen und Durchlaufen der Abfrage
+            // Run and process the query
             foreach ($query->execute() as $object) {
 
-                // Wenn nur eine einzelne Objekteigenschaft als Wert in Frage kommt ...
+                // If only one object property is relevant ...
                 if (array_key_exists('column', $repositoryConfig) && strlen(trim($repositoryConfig['column']))) {
                     $values[] = @call_user_func(array($object, 'get'.ucfirst($repositoryConfig['column'])));
 
-                    // Ansonsten
+                    // Else
                 } else {
                     $values[] = $object;
                 }

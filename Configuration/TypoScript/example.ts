@@ -2,7 +2,7 @@
 plugin.tx_twsitemap.settings.entries {
     0 {
         pid = 1
-        #        languages = 0 // Enable to submit a language parameter during the sitemap generation
+#        languages = 0 // Enable to submit a language parameter during the sitemap generation
         locales = en
         domain = example.com
         origin = sitemap

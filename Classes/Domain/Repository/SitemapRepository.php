@@ -1,11 +1,9 @@
 <?php
 
-namespace Tollwerk\TwSitemap\Domain\Repository;
-
 /***************************************************************
  *  Copyright notice
  *
- *  Copyright © 2017 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
+ *  Copyright © 2019 Dipl.-Ing. Joschi Kuphal (joschi@tollwerk.de)
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -28,26 +26,27 @@ namespace Tollwerk\TwSitemap\Domain\Repository;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\Domain\Repository;
+
+use TYPO3\CMS\Extbase\Persistence\Generic\Typo3QuerySettings;
+use TYPO3\CMS\Extbase\Persistence\Repository;
+
 /**
- * Respository für XML-Sitemaps
+ * XML sitemap repository
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class SitemapRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class SitemapRepository extends Repository
 {
     /**
-     * Zurückgeben aller registrierten Sitemaps
-     *
-     * Diese Methode ignoriert bewusst die storagePid-Einstellung.
-     *
-     * @return array                    Alle Sitemaps
+     * Initialize the repository
      */
-    public function findAll()
+    public function initializeObject()
     {
-        $query = $this->createQuery();
-        $query->getQuerySettings()->setRespectStoragePage(false);
-        return $query->execute();
+        $querySettings = $this->objectManager->get(Typo3QuerySettings::class);
+        $querySettings->setRespectStoragePage(false);
+        $this->setDefaultQuerySettings($querySettings);
     }
 }
