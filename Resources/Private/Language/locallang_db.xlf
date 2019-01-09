@@ -94,6 +94,9 @@
 			<trans-unit id="scheduler.entries.debug" xml:space="preserve">
 				<source>Ouput debugging info</source>
 			</trans-unit>
+			<trans-unit id="scheduler.entries.lang" xml:space="preserve">
+				<source>Language</source>
+			</trans-unit>
         </body>
     </file>
 </xliff>

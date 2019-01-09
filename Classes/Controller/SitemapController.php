@@ -32,7 +32,7 @@ namespace Tollwerk\TwSitemap\Controller;
  * Sitemap-Plugin-Controller
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
@@ -62,6 +62,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * Dependecy-Injection des Sitemap-Repositories
      *
      * @param \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository $sitemapRepository Sitemap-Repository
+     *
      * @return void
      */
     public function injectSitemapRepository(\Tollwerk\TwSitemap\Domain\Repository\SitemapRepository $sitemapRepository)
@@ -78,6 +79,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * Sitemap Gzip-Kompression aktiviert ist.
      *
      * @return string                        XML-Sitemap
+     * @throws \TYPO3\CMS\Extbase\Persistence\Generic\Exception\UnsupportedMethodException
      */
     public function indexAction()
     {
@@ -118,6 +120,7 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * Rendern von Sitemap-Einträgen anhand einer TypoScript-Konfiguration
      *
      * @param string $typoscript Schlüssel der zu rendernden Typoscript-Konfiguration
+     *
      * @return void
      */
     public function typoscriptAction($typoscript = null)
@@ -125,14 +128,15 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
         header('Content-Type: text/xml; charset=utf-8');
 
         /*Tx_Extbase_Utility_TypoScript*/
-        $typoscriptService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+        $typoscriptService           = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
         $this->_entriesConfiguration = array_key_exists('entries',
             $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-        $typoscript = strval($typoscript);
-        $tsConfig = (strlen($typoscript) && array_key_exists("$typoscript.",
+        $typoscript                  = strval($typoscript);
+        $tsConfig                    = (strlen($typoscript) && array_key_exists("$typoscript.",
                 $this->_entriesConfiguration) && array_key_exists('entries.',
                 $this->_entriesConfiguration["$typoscript."])) ? $this->_entriesConfiguration["$typoscript."]['entries.'] : null;
-        $tsResult = is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->getContentObject('COA')->render($tsConfig) : '';
+        $tsResult                    = is_array($tsConfig) ? $GLOBALS['TSFE']->cObj->getContentObject('COA')
+                                                                                   ->render($tsConfig) : '';
         die("<entries>$tsResult</entries>");
         exit;
     }
@@ -141,26 +145,27 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
      * Rendern von Sitemap-Einträgen anhand einer Plugin-Konfiguration
      *
      * @param string $plugin Schlüssel der zu rendernden Plugin-Konfiguration
+     *
      * @return void
      */
     public function pluginAction($plugin = null)
     {
         header('Content-Type: text/xml; charset=utf-8');
 
-        $typoscriptService = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
+        $typoscriptService           = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Service\\TypoScriptService');
         $this->_entriesConfiguration = array_key_exists('entries',
             $this->settings) ? $typoscriptService->convertPlainArrayToTypoScriptArray((array)$this->settings['entries']) : array();
-        $plugin = strval($plugin);
-        $pluginConfig = (strlen($plugin) && array_key_exists("$plugin.",
+        $plugin                      = strval($plugin);
+        $pluginConfig                = (strlen($plugin) && array_key_exists("$plugin.",
                 $this->_entriesConfiguration) && array_key_exists('entries.',
                 $this->_entriesConfiguration["$plugin."])) ? $this->_entriesConfiguration["$plugin."]['entries.'] : null;
 
         // Ermitteln des Parameter-Basisnamens
         $extensionName = array_key_exists('extension', $pluginConfig) ? trim($pluginConfig['extension']) : null;
-        $pluginName = array_key_exists('plugin', $pluginConfig) ? trim($pluginConfig['plugin']) : null;
-        $controller = array_key_exists('controller', $pluginConfig) ? trim($pluginConfig['controller']) : null;
-        $action = array_key_exists('action', $pluginConfig) ? trim($pluginConfig['action']) : null;
-        $parameter = array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : array();
+        $pluginName    = array_key_exists('plugin', $pluginConfig) ? trim($pluginConfig['plugin']) : null;
+        $controller    = array_key_exists('controller', $pluginConfig) ? trim($pluginConfig['controller']) : null;
+        $action        = array_key_exists('action', $pluginConfig) ? trim($pluginConfig['action']) : null;
+        $parameter     = array_key_exists('parameter.', $pluginConfig) ? (array)$pluginConfig['parameter.'] : array();
 
         // Wenn der Parameterbasisname definiert werden kann und ein alternierender Parameter definiert ist
         if (strlen($extensionName) && strlen($pluginName) && strlen($controller) && strlen($action) && count($parameter)) {
@@ -199,15 +204,16 @@ class SitemapController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionControll
     /**
      * Erzeugen von repositorybezogenen Parameterwerten
      *
-     * @param array $config Parameterkonfiguration
+     * @param array $config       Parameterkonfiguration
      * @param array $pluginConfig Globale Konfiguration
+     *
      * @return array                    Parameterwerte
      */
     protected function _getParameterValuesRepository($config, $pluginConfig)
     {
-        $values = array();
+        $values        = array();
         $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
-        $repository = $objectManager->get($config['repository']);
+        $repository    = $objectManager->get($config['repository']);
         if ($repository instanceof \TYPO3\CMS\Extbase\Persistence\Repository) {
             $repositoryConfig = array_key_exists('repository.', $config) ? (array)$config['repository.'] : array();
 

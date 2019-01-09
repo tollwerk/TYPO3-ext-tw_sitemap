@@ -32,10 +32,10 @@ namespace Tollwerk\TwSitemap\Task;
  * Planer-Task zur Erzeugung von XML-Sitemaps
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
+class Sitemap extends AbstractTask
 {
     /**
      * Maximale Anzahl von URLs je Sitemap
@@ -85,7 +85,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
 
         /* @var $sitemapModel \Tollwerk\TwSitemap\Domain\Repository\SitemapRepository */
         /* @var $sitemapEntryModel \Tollwerk\TwSitemap\Domain\Repository\EntryRepository */
-        $sitemapModel = $objectManager->get('Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
+        $sitemapModel      = $objectManager->get('Tollwerk\TwSitemap\Domain\Repository\SitemapRepository');
         $sitemapEntryModel = $objectManager->get('Tollwerk\TwSitemap\Domain\Repository\EntryRepository');
 
         $success = true;
@@ -103,14 +103,15 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Erzeugen einer einzelnen Sitemap
      *
      * @param \Tollwerk\TwSitemap\Domain\Model\Sitemap $sitemap XML-Sitemap
-     * @return boolean                                            Erfolg
-     * @throws Exception                                        Wenn ein ungültiger Sitemap-Dateiname gegeben ist
+     *
+     * @return boolean Erfolg
+     * @throws \TYPO3\CMS\Core\Exception
      */
     protected function _generateSitemap(\Tollwerk\TwSitemap\Domain\Model\Sitemap $sitemap)
     {
-        $sitemapDomain = trim($sitemap->getDomain(), '/ ');
+        $sitemapDomain       = trim($sitemap->getDomain(), '/ ');
         $sitemapTargetDomain = trim($sitemap->getTargetDomain(), '/ ');
-        $sitemapDirectory = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
+        $sitemapDirectory    = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
         $sitemapTmpDirectory = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'.tmp/';
 
         // Ggf. Entfernen eines bereits vorhandenen Temporärverzeichnisses
@@ -118,6 +119,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
             if (!$this->_deleteDirectory($sitemapTmpDirectory)) {
                 $this->addMessage('Sitemap temporary directory could not be deleted',
                     \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+
                 return false;
             }
         }
@@ -126,6 +128,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         if (!@mkdir($sitemapTmpDirectory, 0777, true) || !@chmod($sitemapTmpDirectory, 0777)) {
             $this->addMessage('Sitemap temporary directory could not be created',
                 \TYPO3\CMS\Core\Messaging\FlashMessage::ERROR);
+
             return false;
         }
 
@@ -140,20 +143,20 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         if ($sitemapEntriesResult && $db->sql_num_rows($sitemapEntriesResult)) {
 
             // Vorbereitungen
-            $sitemapSchemePath = $sitemap->getScheme().(strlen($sitemapTargetDomain) ? $sitemapTargetDomain : $sitemapDomain);
-            $sitemapGzip = (boolean)intval($sitemap->getGz());
-            $sitemapFooterLength = strlen(self::SITEMAP_FOOTER);
-            $sitemapFiles = array();
-            $currentSitemapSize = 0;
+            $sitemapSchemePath      = $sitemap->getScheme().(strlen($sitemapTargetDomain) ? $sitemapTargetDomain : $sitemapDomain);
+            $sitemapGzip            = (boolean)intval($sitemap->getGz());
+            $sitemapFooterLength    = strlen(self::SITEMAP_FOOTER);
+            $sitemapFiles           = array();
+            $currentSitemapSize     = 0;
             $currentSitemapResource = $this->_startSitemapFile($sitemapTmpDirectory, $sitemapFiles, $sitemapGzip,
                 $currentSitemapSize);
-            $sitemapURLs = 0;
+            $sitemapURLs            = 0;
 
             // Abrufen und Verarbeiten aller Sitemap-Einträge
             while ($sitemapEntryRecord = $db->sql_fetch_assoc($sitemapEntriesResult)) {
                 $languages = strlen($sitemapEntryRecord['language']) ? explode(',',
                     $sitemapEntryRecord['language']) : array();
-                $locs = explode(',', $sitemapEntryRecord['loc']);
+                $locs      = explode(',', $sitemapEntryRecord['loc']);
 
                 // Generieren des XML-Sitemap-Eintrages
                 $sitemapEntry = '<url><loc>'.htmlspecialchars($sitemapSchemePath.$locs[0]).'</loc><lastmod>'.date('Y-m-d',
@@ -165,9 +168,9 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
                         $sitemapEntry .= '<xhtml:link rel="alternate" hreflang="'.htmlspecialchars($language).'" href="'.htmlspecialchars($sitemapSchemePath.$locs[$index]).'"/>';
                     }
                 }
-                $sitemapEntry .= '</url>';
+                $sitemapEntry       .= '</url>';
                 $sitemapEntryLength = strlen($sitemapEntry);
-                $sitemapProvLength = ($currentSitemapSize + $sitemapEntryLength + $sitemapFooterLength);
+                $sitemapProvLength  = ($currentSitemapSize + $sitemapEntryLength + $sitemapFooterLength);
 
                 // Wenn die aktuelle Sitemap mit diesem Eintrag das Größenlimit überschreiben würde ...
                 if (($sitemapProvLength > self::SIZE_LIMIT) || (($sitemapURLs + 1) > self::URL_LIMIT)) {
@@ -176,8 +179,8 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
                     $this->_stopSitemapFile($currentSitemapResource, $sitemapGzip);
                     $currentSitemapResource = $this->_startSitemapFile($sitemapTmpDirectory, $sitemapFiles,
                         $sitemapGzip, $currentSitemapSize);
-                    $sitemapProvLength = ($currentSitemapSize + $sitemapEntryLength + $sitemapFooterLength);
-                    $sitemapURLs = 0;
+                    $sitemapProvLength      = ($currentSitemapSize + $sitemapEntryLength + $sitemapFooterLength);
+                    $sitemapURLs            = 0;
                 }
 
                 // Schreiben des Eintrages in die Sitemap
@@ -227,9 +230,10 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     /**
      * Öffnen einer neuen Sitemap-Datei
      *
-     * @param string $directory Verzeichnis
+     * @param string $directory   Verzeichnis
      * @param array $sitemapFiles Sitemap-Dateien
-     * @param boolean $gz GZIP-Kompression verwenden
+     * @param boolean $gz         GZIP-Kompression verwenden
+     *
      * @return resource                    Sitemap-Datei
      */
     protected function _startSitemapFile($directory, array &$sitemapFiles, $gz, &$bytes)
@@ -238,13 +242,14 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         $sitemapPath = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
         if ((boolean)$gz) {
             $sitemapName .= '.gz';
-            $sitemap = gzopen($sitemapPath.$sitemapName, 'wb');
-            $bytes = gzwrite($sitemap, self::SITEMAP_PRIMER);
+            $sitemap     = gzopen($sitemapPath.$sitemapName, 'wb');
+            $bytes       = gzwrite($sitemap, self::SITEMAP_PRIMER);
         } else {
             $sitemap = fopen($sitemapPath.$sitemapName, 'wb');
-            $bytes = fwrite($sitemap, self::SITEMAP_PRIMER);
+            $bytes   = fwrite($sitemap, self::SITEMAP_PRIMER);
         }
         $sitemapFiles[] = $sitemapName;
+
         return $sitemap;
     }
 
@@ -252,7 +257,8 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Schließen einer Sitemap-Datei
      *
      * @param resource $sitemap Sitemap-Resource
-     * @param boolean $gz GZIP-Kompression verwendet
+     * @param boolean $gz       GZIP-Kompression verwendet
+     *
      * @return void
      */
     protected function _stopSitemapFile($sitemap, $gz)
@@ -269,30 +275,32 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     /**
      * Erzeugen eines Sitemap-Index
      *
-     * @param string $directory Verzeichnis
+     * @param string $directory   Verzeichnis
      * @param array $sitemapFiles Sitemap-Dateien
-     * @param boolean $gz GZIP-Kompression verwenden
-     * @param string $urlbase Basis-URL für einzelne Sitemap-Dateien
+     * @param boolean $gz         GZIP-Kompression verwenden
+     * @param string $urlbase     Basis-URL für einzelne Sitemap-Dateien
+     *
      * @return boolean                    Erfolg
      */
     protected function _createSitemapIndex($directory, array $sitemapFiles, $gz, $urlbase)
     {
         $sitemapIndex = self::SITEMAP_INDEX_PRIMER;
-        $now = date('Y-m-d');
+        $now          = date('Y-m-d');
         foreach ($sitemapFiles as $sitemapFile) {
             $sitemapIndex .= '<sitemap><loc>'.$urlbase.$sitemapFile.'</loc><lastmod>'.$now.'</lastmod></sitemap>';
         }
-        $sitemapIndex .= self::SITEMAP_INDEX_FOOTER;
+        $sitemapIndex     .= self::SITEMAP_INDEX_FOOTER;
         $sitemapIndexPath = rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'sitemap.xml';
         if ((boolean)$gz) {
-            $sitemapIndexPath .= '.gz';
+            $sitemapIndexPath     .= '.gz';
             $sitemapIndexResource = gzopen($sitemapIndexPath, 'wb');
-            $bytes = gzwrite($sitemapIndexResource, $sitemapIndex);
+            $bytes                = gzwrite($sitemapIndexResource, $sitemapIndex);
             gzclose($sitemapIndexResource);
         } else {
             $bytes = file_put_contents($sitemapIndexPath, $sitemapIndex);
         }
         @chmod($sitemapIndexPath, 0777);
+
         return (boolean)$bytes;
     }
 
@@ -300,6 +308,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Löschen eines Verzeichnisses samt Inhalt
      *
      * @param string $directory Verzeichnis
+     *
      * @return boolean                        Erfolg
      */
     protected function _deleteDirectory($directory)
@@ -334,24 +343,24 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
         $additionalFields = array();
 
         // Language parameter
-        $fieldName = 'tx_scheduler[tw_sitemap_lang]';
-        $fieldId = 'task_sitemap_lang';
-        $fieldHTML = '<input type="text" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->lang) ? 'L' : $task->lang).'"/>';
+        $fieldName                  = 'tx_scheduler[tw_sitemap_lang]';
+        $fieldId                    = 'task_sitemap_lang';
+        $fieldHTML                  = '<input type="text" name="'.$fieldName.'" id="'.$fieldId.'" value="'.htmlspecialchars(empty($task->lang) ? 'L' : $task->lang).'"/>';
         $additionalFields[$fieldId] = array(
-            'code' => $fieldHTML,
-            'label' => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.lang',
-            'cshKey' => '_MOD_system_txschedulerM1',
+            'code'     => $fieldHTML,
+            'label'    => 'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:scheduler.entries.lang',
+            'cshKey'   => '_MOD_system_txschedulerM1',
             'cshLabel' => $fieldId
         );
 
-        $fieldName = 'tx_scheduler[tw_sitemap_baseurl]';
-        $fieldId = 'task_sitemap_baseurl';
-        $fieldOptions = $this->_getSitemapOptions($taskInfo['scheduler_cachingFrameworkGarbageCollection_selectedBackends']);
-        $fieldHtml = '<select name="'.$fieldName.'" id="'.$fieldId.'" class="wide" size="10" multiple="multiple">'.$fieldOptions.'</select>';
+        $fieldName                  = 'tx_scheduler[tw_sitemap_baseurl]';
+        $fieldId                    = 'task_sitemap_baseurl';
+        $fieldOptions               = $this->_getSitemapOptions($taskInfo['scheduler_cachingFrameworkGarbageCollection_selectedBackends']);
+        $fieldHtml                  = '<select name="'.$fieldName.'" id="'.$fieldId.'" class="wide" size="10" multiple="multiple">'.$fieldOptions.'</select>';
         $additionalFields[$fieldId] = array(
-            'code' => $fieldHtml,
-            'label' => 'LLL:EXT:scheduler/Resources/Private/Language/locallang.xlf:label.cachingFrameworkGarbageCollection.selectBackends',
-            'cshKey' => '_MOD_system_txschedulerM1',
+            'code'     => $fieldHtml,
+            'label'    => 'LLL:EXT:scheduler/Resources/Private/Language/locallang.xlf:label.cachingFrameworkGarbageCollection.selectBackends',
+            'cshKey'   => '_MOD_system_txschedulerM1',
             'cshLabel' => $fieldId
         );
 
@@ -376,6 +385,7 @@ class Sitemap extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      * Return all available sitemaps as options
      *
      * @param \int $selectedSitemap Selected sitemap
+     *
      * @return \string                    Sitemap options
      */
     protected function _getSitemapOptions($selectedSitemap = 0)

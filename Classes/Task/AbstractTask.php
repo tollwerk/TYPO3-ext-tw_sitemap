@@ -32,7 +32,7 @@ namespace Tollwerk\TwSitemap\Task;
  * Planer-Task zur Erzeugung von XML-Sitemap-Einträgen
  *
  * @package tw_sitemap
- * @author Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
+ * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
 abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
@@ -40,9 +40,11 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
     /**
      * Add a flash message
      *
-     * @param \string $message Message
+     * @param \string $message   Message
      * @param \integer $severity Severity
+     *
      * @return void
+     * @throws \TYPO3\CMS\Core\Exception
      */
     public function addMessage($message, $severity = \TYPO3\CMS\Core\Messaging\FlashMessage::OK)
     {
