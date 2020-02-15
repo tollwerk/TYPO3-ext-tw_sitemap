@@ -29,6 +29,7 @@
 namespace Tollwerk\TwSitemap\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Annotation as Extbase;
 
 /**
  * XML sitemap entries
@@ -43,7 +44,7 @@ class Entry extends AbstractEntity
      * Domain
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $domain;
 
@@ -51,7 +52,7 @@ class Entry extends AbstractEntity
      * Entry origin
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $origin;
 
@@ -59,7 +60,7 @@ class Entry extends AbstractEntity
      * Entry URL
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $loc;
 
@@ -67,7 +68,7 @@ class Entry extends AbstractEntity
      * Last modified
      *
      * @var \DateTime
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $lastmod;
 
@@ -75,7 +76,7 @@ class Entry extends AbstractEntity
      * Change frequency
      *
      * @var int
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $changefreq;
 
@@ -83,7 +84,7 @@ class Entry extends AbstractEntity
      * Priority
      *
      * @var float
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $priority;
 
@@ -98,7 +99,7 @@ class Entry extends AbstractEntity
      * Position
      *
      * @var int
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $position;
 

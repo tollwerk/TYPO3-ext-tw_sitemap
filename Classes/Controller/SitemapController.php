@@ -30,6 +30,7 @@ namespace Tollwerk\TwSitemap\Controller;
 
 use Tollwerk\TwSitemap\Domain\Model\Sitemap;
 use Tollwerk\TwSitemap\Domain\Repository\SitemapRepository;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -105,7 +106,7 @@ class SitemapController extends ActionController
 
         // If a matching sitemap entry was found
         if ($sitemap instanceof Sitemap) {
-            $sitemapDirectory = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
+            $sitemapDirectory = Environment::getPublicPath().'/typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
 
             if (@is_dir($sitemapDirectory)) {
                 $sitemapGzip = (boolean)intval($sitemap->getGz());

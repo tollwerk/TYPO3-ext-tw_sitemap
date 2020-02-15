@@ -26,39 +26,43 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
-
 if (!defined('TYPO3_MODE')) {
     die('Access denied.');
 }
 
-$GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$_EXTKEY] = unserialize($_EXTCONF);
+call_user_func(
+    function($extKey, $extConf) {
+        $GLOBALS['TYPO3_CONF_VARS']['EXT']['extParams'][$extKey] = unserialize($extConf);
 
-// Configure the sitemap plugin
-ExtensionUtility::configurePlugin(
-    'Tollwerk.'.
-    $_EXTKEY,
-    'Sitemap',
-    array(
-        'Sitemap' => 'index,typoscript,plugin',
-    ),
-    array(
-        'Sitemap' => 'index,typoscript,plugin',
-    )
-);
+        // Configure the sitemap plugin
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+            'Tollwerk.'.
+            $extKey,
+            'Sitemap',
+            array(
+                'Sitemap' => 'index,typoscript,plugin',
+            ),
+            array(
+                'Sitemap' => 'index,typoscript,plugin',
+            )
+        );
 
-// Register the scheduler tasks
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Sitemap'] = array(
-    'extension'   => $_EXTKEY,
-    'title'       => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap',
-    'description' => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap.description',
-);
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tollwerk\\TwSitemap\\Task\\Entries'] = array(
-    'extension'        => $_EXTKEY,
-    'title'            => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
-    'description'      => 'LLL:EXT:'.$_EXTKEY.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
-    'additionalFields' => 'Tollwerk\\TwSitemap\\Task\\Entries',
-);
+        // Register the scheduler tasks
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Tollwerk\TwSitemap\Task\Sitemap::class] = array(
+            'extension'   => $extKey,
+            'title'       => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap',
+            'description' => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang.xlf:scheduler.sitemap.description',
+        );
+        $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks'][\Tollwerk\TwSitemap\Task\Entries::class] = array(
+            'extension'        => $extKey,
+            'title'            => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang.xlf:scheduler.entries',
+            'description'      => 'LLL:EXT:'.$extKey.'/Resources/Private/Language/locallang.xlf:scheduler.entries.description',
+            'additionalFields' => \Tollwerk\TwSitemap\Task\Entries::class,
+        );
 
-$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[typoscript]';
-$GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[plugin]';
+        $GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[typoscript]';
+        $GLOBALS['TYPO3_CONF_VARS']['FE']['cacheHash']['excludedParameters'][] = 'tx_twsitemap_sitemap[plugin]';
+    },
+    'tw_sitemap',
+    $_EXTCONF
+);

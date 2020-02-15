@@ -29,6 +29,7 @@
 namespace Tollwerk\TwSitemap\Domain\Model;
 
 use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+use TYPO3\CMS\Extbase\Annotation as Extbase;
 
 /**
  * XML Sitemap
@@ -43,7 +44,7 @@ class Sitemap extends AbstractEntity
      * Domain
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $domain;
 
@@ -58,7 +59,7 @@ class Sitemap extends AbstractEntity
      * Scheme
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $scheme;
 
@@ -66,7 +67,7 @@ class Sitemap extends AbstractEntity
      * File name
      *
      * @var string
-     * @validate NotEmpty
+     * @Extbase\Validate("NotEmpty")
      */
     protected $filename;
 

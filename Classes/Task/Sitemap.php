@@ -31,6 +31,7 @@ namespace Tollwerk\TwSitemap\Task;
 use Tollwerk\TwSitemap\Domain\Model\Entry;
 use Tollwerk\TwSitemap\Domain\Model\Sitemap as SitemapRecord;
 use Tollwerk\TwSitemap\Domain\Repository\SitemapRepository;
+use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Exception;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -117,8 +118,8 @@ class Sitemap extends AbstractTask
     {
         $sitemapDomain       = trim($sitemap->getDomain(), '/ ');
         $sitemapTargetDomain = trim($sitemap->getTargetDomain(), '/ ');
-        $sitemapDirectory    = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
-        $sitemapTmpDirectory = PATH_site.'typo3temp/tw_sitemap/'.$sitemap->getUid().'.tmp/';
+        $sitemapDirectory    = Environment::getPublicPath().'/typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
+        $sitemapTmpDirectory = Environment::getPublicPath().'/typo3temp/tw_sitemap/'.$sitemap->getUid().'.tmp/';
 
         // Remove existing temporary directory
         if (@is_dir($sitemapTmpDirectory)) {

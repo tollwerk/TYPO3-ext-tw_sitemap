@@ -26,9 +26,6 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
-
 if (!defined('TYPO3_MODE')) {
     die ('Access denied.');
 }
@@ -36,26 +33,30 @@ if (!defined('TYPO3_MODE')) {
 call_user_func(
     function() {
         // Register the TypoScript setup
-        ExtensionManagementUtility::addStaticFile('tw_sitemap', 'Configuration/TypoScript', 'tollwerk XML Sitemap');
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile(
+            'tw_sitemap',
+            'Configuration/TypoScript',
+            'tollwerk XML Sitemap'
+        );
 
         // Allow records on standard files
-        ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_entry');
-        ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_sitemap');
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_entry');
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::allowTableOnStandardPages('tx_twsitemap_domain_model_sitemap');
 
         // Register the sitemap entry table
-        ExtensionManagementUtility::addLLrefForTCAdescr(
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
             'tx_twsitemap_domain_model_entry',
             'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_entry.xlf'
         );
 
         // Register the sitemap table
-        ExtensionManagementUtility::addLLrefForTCAdescr(
+        \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addLLrefForTCAdescr(
             'tx_twsitemap_domain_model_sitemap',
             'EXT:tw_sitemap/Resources/Private/Language/locallang_csh_tx_twsitemap_domain_model_sitemap.xlf'
         );
 
         // Register the sitemap plugin
-        ExtensionUtility::registerPlugin(
+        \TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
             'Tollwerk.TwSitemap',
             'Sitemap',
             'LLL:EXT:tw_sitemap/Resources/Private/Language/locallang_db.xlf:feplugin'
