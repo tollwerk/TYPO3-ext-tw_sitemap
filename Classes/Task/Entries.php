@@ -28,6 +28,7 @@
 
 namespace Tollwerk\TwSitemap\Task;
 
+use Tollwerk\TwBase\Utility\CurlUtility;
 use Tollwerk\TwSitemap\Domain\Model\Entry;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -132,6 +133,13 @@ class Entries extends AbstractTask implements AdditionalFieldProviderInterface
      * @var string
      */
     const CONFIG_TYPE_PLUGIN = 'plugin';
+    /**
+     * Page types
+     */
+    const TYPENUMS = [
+        self::CONFIG_TYPE_TYPOSCRIPT => 1212,
+        self::CONFIG_TYPE_PLUGIN     => 1213,
+    ];
 
     /**
      * Run the entry generation
@@ -447,7 +455,7 @@ class Entries extends AbstractTask implements AdditionalFieldProviderInterface
         $url                                  = $baseUrl;
         $urlCredentials                       = empty($url['user']) ?
             '' : rawurlencode($url['user']).(empty($url['pass']) ? '' : ':'.rawurlencode($url['pass'])).'@';
-        $url['query']['type']                 = 1212;
+        $url['query']['type']                 = self::TYPENUMS[$type];
         $url['query']['tx_twsitemap_sitemap'] = array($type => $key);
         $url                                  = $url['scheme'].'://'.$urlCredentials.$url['host'].
                                                 (array_key_exists('port', $url) ? ':'.$url['port'] : '').
@@ -458,7 +466,7 @@ class Entries extends AbstractTask implements AdditionalFieldProviderInterface
         }
 
         $this->generateEntriesByXML(
-            strval(file_get_contents($url, 0, $this->httpContext)),
+            CurlUtility::httpRequest($url),
             $domain,
             $defaultOrigin,
             $defaultChangefreq,

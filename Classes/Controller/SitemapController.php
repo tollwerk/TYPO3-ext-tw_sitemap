@@ -34,6 +34,7 @@ use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
+use TYPO3\CMS\Extbase\Object\Exception;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 use TYPO3\CMS\Frontend\ContentObject\Exception\ContentRenderingException;
@@ -48,6 +49,14 @@ use TYPO3\CMS\Frontend\ContentObject\Exception\ContentRenderingException;
 class SitemapController extends ActionController
 {
     /**
+     * Plugin parameter callbacs
+     *
+     * @var array
+     */
+    protected static $_pluginParameterTypeCallbacks = array(
+        'repository' => 'getParameterValuesRepository',
+    );
+    /**
      * Sitemap entry repository
      *
      * @var SitemapRepository
@@ -59,14 +68,6 @@ class SitemapController extends ActionController
      * @var array
      */
     protected $entriesConfiguration = [];
-    /**
-     * Plugin parameter callbacs
-     *
-     * @var array
-     */
-    protected static $_pluginParameterTypeCallbacks = array(
-        'repository' => 'getParameterValuesRepository',
-    );
 
     /**
      * Inject the sitemap repositors
@@ -213,6 +214,7 @@ class SitemapController extends ActionController
      * @param array $pluginConfig Global configuration
      *
      * @return array Parameter values
+     * @throws Exception
      */
     protected function getParameterValuesRepository($config, $pluginConfig): array
     {
@@ -235,6 +237,7 @@ class SitemapController extends ActionController
 
             // Run and process the query
             foreach ($query->execute() as $object) {
+//                echo gettype($object).PHP_EOL;
 
                 // If only one object property is relevant ...
                 if (array_key_exists('column', $repositoryConfig) && strlen(trim($repositoryConfig['column']))) {

@@ -1,9 +1,5 @@
 <?php
 
-namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
-
-use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
-
 /***************************************************************
  *  Copyright notice
  *
@@ -30,6 +26,12 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
+namespace Tollwerk\TwSitemap\ViewHelpers\Arrays;
+
+use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3Fluid\Fluid\Core\ViewHelper\Traits\CompileWithContentArgumentAndRenderStatic;
+
 /**
  * Viewhelper for dynamically creating arrays
  *
@@ -52,18 +54,37 @@ use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
  */
 class CombineViewHelper extends AbstractViewHelper
 {
-    /**
-     * Combines array and keys to a new array
-     *
-     * @param array $keys  Keys
-     * @param array $index Values
-     *
-     * @return array Combined array
-     */
-    public function render(array $keys, array $values): array
-    {
-        $count = min(count($keys), count($values));
+    use CompileWithContentArgumentAndRenderStatic;
 
-        return array_combine(array_slice($keys, 0, $count), array_slice($values, 0, $count));
+    /**
+     * Initialize all arguments. You need to override this method and call
+     * $this->registerArgument(...) inside this method, to register all your arguments.
+     *
+     * @return void
+     * @api
+     */
+    public function initializeArguments()
+    {
+        $this->registerArgument('keys', 'array', 'Array keys');
+        $this->registerArgument('values', 'array', 'Array values');
+    }
+
+    /**
+     * Format a timestamp as human readable string like "one hour ago"
+     *
+     * @param array $arguments
+     * @param \Closure $renderChildrenClosure
+     * @param RenderingContextInterface $renderingContext
+     *
+     * @return string Age string
+     */
+    public static function renderStatic(
+        array $arguments,
+        \Closure $renderChildrenClosure,
+        RenderingContextInterface $renderingContext
+    ) {
+        $count = min(count($arguments['keys']), count($arguments['values']));
+
+        return array_combine(array_slice($arguments['keys'], 0, $count), array_slice($arguments['values'], 0, $count));
     }
 }
