@@ -31,6 +31,8 @@ namespace Tollwerk\TwSitemap\Controller;
 use Tollwerk\TwSitemap\Domain\Model\Sitemap;
 use Tollwerk\TwSitemap\Domain\Repository\SitemapRepository;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
@@ -89,9 +91,14 @@ class SitemapController extends ActionController
      */
     public function indexAction(): void
     {
-        $serverParams = $GLOBALS['TYPO3_REQUEST']->getServerParams();
-        $httpHost     = $serverParams['HTTP_HOST'];
-        $sitemap      = $this->sitemapRepository->findOneByTargetDomain($httpHost);
+        /**
+         * @var ServerRequest $request
+         * @var Site $site
+         */
+        $request  = $GLOBALS['TYPO3_REQUEST'];
+        $site     = $request->getAttribute('site');
+        $httpHost = trim(parse_url($site->getConfiguration()['base'], PHP_URL_HOST) ?: $site->getBase()->getHost());
+        $sitemap  = $this->sitemapRepository->findOneByTargetDomain($httpHost);
         if (!($sitemap instanceof Sitemap)) {
             $sitemap = $this->sitemapRepository->findOneByDomain($httpHost);
             if (!($sitemap instanceof Sitemap)) {
@@ -108,18 +115,15 @@ class SitemapController extends ActionController
         // If a matching sitemap entry was found
         if ($sitemap instanceof Sitemap) {
             $sitemapDirectory = Environment::getPublicPath().'/typo3temp/tw_sitemap/'.$sitemap->getUid().'/';
-
-            if (@is_dir($sitemapDirectory)) {
-                $sitemapGzip = (boolean)intval($sitemap->getGz());
-                $sitemapPath = $sitemapDirectory.'sitemap.xml'.($sitemapGzip ? '.gz' : '');
-                if (@is_file($sitemapPath) && @is_readable($sitemapPath)) {
-                    header('Content-Type: application/xml; charset=utf-8');
-                    if ($sitemapGzip) {
-                        header('Content-Encoding: gzip');
-                    }
-                    readfile($sitemapPath);
-                    exit;
+            $sitemapPath      = $sitemapDirectory.'sitemap.xml';
+            if (@is_file($sitemapPath) && @is_readable($sitemapPath)) {
+                header('Content-Type: application/xml; charset=utf-8');
+                if ($gzCompress = $GLOBALS['TSFE']->type == 1211) {
+                    ob_start('ob_gzhandler');
                 }
+                readfile($sitemapPath);
+                ob_end_flush();
+                exit;
             }
         }
     }
