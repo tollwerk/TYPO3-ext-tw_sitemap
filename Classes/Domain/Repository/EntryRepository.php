@@ -28,10 +28,13 @@
 
 namespace Tollwerk\TwSitemap\Domain\Repository;
 
+use DateTimeInterface;
 use Tollwerk\TwSitemap\Domain\Model\Entry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException;
 use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
+use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * XML sitemap entry repository
@@ -40,7 +43,7 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
  * @author  Dipl.-Ing. Joschi Kuphal <joschi@tollwerk.de>
  * @license http://www.gnu.org/licenses/lgpl.html GNU Lesser General Public License, version 3 or later
  */
-class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class EntryRepository extends Repository
 {
     /**
      * Default ordering
@@ -48,8 +51,8 @@ class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @var array
      */
     protected $defaultOrderings = array(
-        'priority' => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_DESCENDING,
-        'loc'      => \TYPO3\CMS\Extbase\Persistence\QueryInterface::ORDER_ASCENDING
+        'priority' => QueryInterface::ORDER_DESCENDING,
+        'loc'      => QueryInterface::ORDER_ASCENDING
     );
 
     /**
@@ -78,9 +81,9 @@ class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param string $domain Domain
      * @param string $loc    URL
      *
-     * @return Entry        Sitemap-Eintrag
+     * @return Entry|null Sitemap entry
      */
-    public function findOneByDomainLoc($domain, $loc): ?Entry
+    public function findOneByDomainLoc(string $domain, string $loc): ?Entry
     {
         $query = $this->createQuery();
         $query->matching($query->logicalAnd(array(
@@ -90,5 +93,25 @@ class EntryRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $result = $query->execute();
 
         return count($result) ? $result->getFirst() : null;
+    }
+
+    /**
+     * Return the last modification date (all sites / sitemaps)
+     *
+     * @param string|null $domain Optional: Domain
+     *
+     * @return DateTimeInterface|null Last modification Date
+     */
+    public function findLastModificationDate(string $domain = null): ?DateTimeInterface
+    {
+        $query = $this->createQuery();
+        $query->getQuerySettings()->setRespectStoragePage(false);
+        if ($domain) {
+            $query->matching($query->equals('domain', $domain));
+        }
+        $query->setOrderings(['lastmod' => QueryInterface::ORDER_DESCENDING])->setLimit(1);
+        $lastModified = $query->execute()->getFirst();
+
+        return $lastModified ? $lastModified->getLastmod() : null;
     }
 }
