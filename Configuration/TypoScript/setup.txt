@@ -118,7 +118,7 @@ xmlSitemapPlugin {
 }
 
 # ADD ROBOTS META ELEMENT
-[globalVar = LIT:1 = {$plugin.tx_twsitemap.settings.meta}]
+[{$plugin.tx_twsitemap.settings.meta}]
     page.meta.robots.cObject = COA
     page.meta.robots.cObject {
         10 = CASE
